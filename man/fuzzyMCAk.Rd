@@ -3,7 +3,7 @@
 \title{fuzzyMCAk}
 \description{Implements Fuzzy Cluster MCA (Hwang, Dillon and Takane, 2010) which combines Multiple Correspondence Analysis for dimension reduction with fuzzy c-means (Bezdek, 1981) for clustering.}
 \usage{
-fuzzyMCAk(data,nclus,ndim,nstart=100)}
+fuzzyMCAk(data,nclus=3,ndim=2,nstart=1)}
 \arguments{
 \item{data}{categorical dataset}                                                    
   \item{nclus}{number of clusters}
@@ -24,11 +24,11 @@ fuzzyMCAk(data,nclus,ndim,nstart=100)}
 
 Hwang, H., Dillon, W. R. and Takane, Y. (2010). Fuzzy Cluster Multiple Correspondence Analysis. Behaviormetrika, 37(2), 111-133.
 }
-\author{Markos, A. \email{<amarkos@gmail.com>}, Iodice D'Enza , A. \email{<iodicede@gmail.com>} and Van de Velden, M. \email{<vandevelden@ese.eur.nl>}}
+\author{Markos, A. \email{amarkos@gmail.com}, Iodice D'Enza , A. \email{iodicede@gmail.com} and Van de Velden, M. \email{vandevelden@ese.eur.nl}}
 \seealso{\code{\link{groupals}}, \code{\link{iFCB}}, \code{\link{MCAk}}}
 \examples{
      data(underwear)  
-     outfMCAk <- fuzzyMCAk(underwear[c(1:200),c(1:2)],nstart=1,nclus=3,ndim=2)
+     outfMCAk <- fuzzyMCAk(underwear[c(1:200),c(1:2)],nclus=3,ndim=2,nstart=1)
      plotrd(outfMCAk)
      }
 \keyword{cluster}

@@ -10,7 +10,6 @@ ReducedKM <- function(data,nclus,ndim,nstart=100, smartStart=F){
   A = princomp(data)$loadings[,c(1:ndim)]
   
   oldf = 1000000                   
-  # Fv={}
   
   for (b in 1:nstart){
     

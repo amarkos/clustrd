@@ -12,7 +12,7 @@
   \item{fname}{name of the png file to be created. Default file name is "figure".}
 }
 \value{a ggplot object}
-\author{Markos, A. \email{<amarkos@gmail.com>}, Iodice D'Enza, A. \email{<iodicede@gmail.com>} and Van de Velden, M. \email{<vandevelden@ese.eur.nl>}}
+\author{Markos, A. \email{amarkos@gmail.com}, Iodice D'Enza, A. \email{iodicede@gmail.com} and Van de Velden, M. \email{vandevelden@ese.eur.nl}}
 \keyword{cluster}
 \keyword{clustering}% __ONLY ONE__ keyword per line
 

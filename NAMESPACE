@@ -1,2 +1,2 @@
 export(ReducedKM, FactorialKM, groupals, MCAk, fuzzyMCAk, iFCB, plotrd)
-import(corpcor, e1071, ggplot2, randtoolbox, irlba)
+import(corpcor, e1071, ggplot2, irlba)

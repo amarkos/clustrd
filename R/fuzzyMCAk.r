@@ -1,10 +1,20 @@
-fuzzyMCAk <- function(data,nclus=3,ndim=2,nstart=100){
+fuzzyMCAk <- function(data,nclus=3,ndim=2,nstart=1){
+  
+  #in case of binary input
+  minobs = min(data)
+  maxobs = max(data)
   
   data = data.matrix(data)
   n=nrow(data)
-  zitem=ncol(data)            
-  zncati=apply(data,2,max)
-  zz=disjMake(data)  
+  zitem=ncol(data)
+
+  if ((minobs==0) & (maxobs==1)) {
+    zncati=apply(data,2,max)+1 
+  } else {
+    zncati=apply(data,2,max)
+  }
+  
+  zz=disjMake(data)$dZ  
   zncat= sum(zncati)
   oner = matrix(1,n,1)
   muz  = apply(zz,2,mean)

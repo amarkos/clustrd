@@ -1,33 +1,48 @@
-iFCB<- function(data,nclus,ndim,nstart=100,smartStart=F){
-  data = data.matrix(data)
+iFCB<- function(data,nclus=3,ndim=2,nstart=100,smartStart=F,seed=1234){
+  data = data.matrix(data) 
+  outDisj=disjMake(data)
+  
+  #in case of binary input
+  minobs = min(data)
+  maxobs = max(data)
+  
   q=ncol(data)
   n=nrow(data)
-  dZ=disjMake(data)
+  dZ=outDisj$dZ
+  
   Q=ncol(dZ)  
-  oldf=1000000
+  best_f=1000000
   
   for(b in 1:nstart){
     
+    set.seed(seed+b)
+    
     gvec =matrix(ceiling(runif(n)*nclus),n,1)
+    #print(ceiling(runif(n)*nclus)[1:10])
     if(smartStart==T){
-      gvec=kmeans(dZ,nclus,nstart=100)$cluster
+      outkstart=kmeans(dZ,nclus,nstart=100)
+      gvec=outkstart$cluster  
     }
     C=matrix(0,n,nclus)
     for (i in 1:n){
       C[i,gvec[i]]=1
     }
     
+    #print("random cluster allocation matrix")
     w= -Inf
     ceps=0.00000001
     itmax=100
-    it=0 
+    it=0 ### inizializzazione contatore iterazioni
     imp=100000 
-    f0 =10000000 
-    u=matrix(1,n,1)
+    f0 =10000000 ## inizializzazione criterio di arresto
+    u=matrix(1,n,1);## vettore di 'uno' 
+    #story.obscoord=list()
     
     while((it<=itmax)&&(imp>ceps)){
       
       it=it+1 
+      #print("it")
+      #print(it)
       
       Fmat=t(C) %*% dZ
       P=Fmat/sum(Fmat)
@@ -36,93 +51,78 @@ iFCB<- function(data,nclus,ndim,nstart=100,smartStart=F){
       
       r=t(t(r))
       c=t(t(c))
-      rvec=as.vector(r)
-      cvec=as.vector(c)
-      Dr=diag(rvec)
-      Dc=diag(cvec)
-      
-      Dz=diag(diag(t(dZ)%*% dZ))
-      DQ=Dz/(n*q)
-      sqDQ=sqrt(DQ)
-      invDQ=solve(DQ)
-      invsqDQ=sqrt(invDQ)
-      invDr=diag((1/rvec))
-      invDc=diag(1/cvec)
-      sqDr=diag(sqrt(rvec))
-      sqDc=diag(sqrt(cvec))
-      invsqDr=diag(sqrt(1/rvec)) 
-      invsqDc=diag(sqrt(1/cvec)) 
-      oner=matrix(1,nrow=nrow(P))
       onec=matrix(1,nrow=ncol(P))
-      onen=matrix(1,n,1)
-      eyen=diag(as.vector(onen))
-      nsSpc= sqrt(q)*(P %*% invDc - r %*% t(onec)) %*% sqDc
+      nsSpc=sqrt(q)*   t(t(t(t(P)*as.vector(1/c)) - r %*% t(onec)) * as.vector(sqrt(c)))
+   #
+      
       nssvdres=svd(nsSpc)
-      nU=nssvdres$u[,1:ndim]
-      nV=nssvdres$v[,1:ndim]
-      nDsv=diag(nssvdres$d[1:ndim])
-      invnDsv=diag(1/nssvdres$d[1:ndim])
-      invnSqDsv=diag(1/sqrt(nssvdres$d[1:ndim]))
-      G =  nU %*% nDsv
-      B = invsqDc %*% nV %*% nDsv
-      nsSCc = invsqDc %*% nV
       
-      Csize=diag(t(C)%*% C)
+     # print("decomposition done")
+      
+      nU  = nssvdres$u[,1:ndim]
+      nV  = nssvdres$v[,1:ndim]
+      nsv = nssvdres$d[1:ndim]
+      
+      G =  t(t(nU)*nsv)
+      
+      B =   (1/(sqrt(as.vector(c)*sqrt(q)))) * t(t(nV) * nsv)  
+      
+      Csize = apply(C,2,sum)
       Cw = as.vector(C %*% Csize)
-      Dw = diag(as.vector(Cw))
-      Y = Dw %*% (dZ / (n*sqrt(q)))  %*% B %*% invnDsv
+      Y = Cw * (dZ / (n*sqrt(q))) %*% t(t(B) * as.vector(1/nsv))
       
-      outK = kmeans(Y,centers=G)
-      ngvec = outK$cluster
-      G=outK$centers
+      Kout = kmeans(Y,centers=G)
+      G=Kout$centers
+      ngvec = Kout$cluster
       
       C=matrix(0,n,nclus)
-      for(i in 1:n){
+      for (i in 1:n){
         C[i,ngvec[i]]=1
       }
+  
+      centerC=matrix(apply(C,2,sum),nrow=n,ncol=nclus,byrow=T)/n
+      centerZ=matrix(c*(n*q),nrow=n,ncol=ncol(dZ),byrow=T)/n
+  
+      Cstar=C-centerC
+      Zstar=dZ-centerZ
       
-      centerOp=eyen-onen%*%t(onen)/n
-      Cstar=centerOp %*% C
-      Zstar=centerOp %*% dZ
-      Dzstar=diag(diag(t(Zstar)%*% Zstar))
-      
-      flossA=sum(diag(t(Cstar-Zstar %*%sqDc %*% B %*% t(nU) ) %*% (Cstar-Zstar %*% sqDc %*% B %*% t(nU))))
-      flossB=sum(diag(t(Y - Cstar %*% G) %*% (Y - Cstar %*% G)))
-      
+      fA=Cstar- t(t(Zstar) * as.vector(sqrt(c))) %*% B %*% t(nU) 
+      flossA=sum(diag(t(fA) %*% fA))  
+      flossB=sum(diag(t(Y - Cstar %*% G) %*% (Y - Cstar %*% G)))    
       f=flossA+flossB 
       imp=f0-f
-      
-      
       f0=f
-      
     }
     
-    if(f<=oldf){
+    if(f<=best_f){
       
-      oldf=f
-      oldngvec=ngvec	
-      oldnewdZ=Y	
-      oldattcoord=B  
-      oldcentroids=G
-      oldG=G
-      oldC=C
-      oldit=it
+      best_f=f
+      best_ngvec=ngvec	
+      best_Y=Y
+      best_B=B
+      best_G=G
+      best_it=it
     }
-    old_Y=Y
-    old_B=B
-    old_G=G
     
-    old_it=it
+    
+    
   }## end FOR
   
-  ####################
-  f=oldf
-  ngvec=oldngvec	
-  Y=old_Y	
-  B=old_B
-  G=old_G
-  it=old_it
   #####################
+  ####################
+  f=best_f
+  ngvec=best_ngvec	
+  Y=best_Y	
+  B=best_B
+  G=best_G
+  
+  it=best_it
+  
+  ####################
+  #####################
+  if ((minobs==0) & (maxobs==1)) {
+    B=B[seq(from=1,to=(2*q),by=2),]
+  }
   otpt=list() 
   otpt$obscoord=Y
   otpt$attcoord=B

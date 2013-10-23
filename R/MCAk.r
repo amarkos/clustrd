@@ -1,9 +1,19 @@
-MCAk <- function(data,nclus=3,ndim=2,nstart=100,smartStart=F){
+MCAk <- function(data,nclus=3,ndim=2,nstart=100,smartStart=F,seed=1234){
   data = data.matrix(data)
+  
+  #in case of binary input
+  minobs = min(data)
+  maxobs = max(data)
+  
   n=nrow(data)
   zitem=ncol(data)            
-  zncati=apply(data,2,max)
-  zz=disjMake(data)
+  if ((minobs==0) & (maxobs==1)) {
+    zncati=apply(data,2,max)+1 
+  } else {
+    zncati=apply(data,2,max)
+  }
+  
+  zz=disjMake(data)$dZ
   zncat= sum(zncati)    
   oner = matrix(1,n,1)
   muz  = apply(zz,2,mean)
@@ -28,6 +38,8 @@ MCAk <- function(data,nclus=3,ndim=2,nstart=100,smartStart=F){
   for(b in 1:nstart){
     Fv={}
     Fm= F0
+    
+    set.seed(seed+b)
     
     index0=matrix(ceiling(runif(n)*nclus),n,1)
     

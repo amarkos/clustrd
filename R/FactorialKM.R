@@ -7,7 +7,7 @@ FactorialKM <- function(data,nclus,ndim,nstart=100,smartStart=F){
   # step 0 - initialization
   # starting values for A
   A = princomp(data,cor=TRUE)$loadings[,c(1:ndim)]
-
+  
   oldf = 1000000                   
   
   for (b in 1:nstart){
@@ -32,13 +32,13 @@ FactorialKM <- function(data,nclus,ndim,nstart=100,smartStart=F){
       U = diag(nlevels(cluID))[cluID,] #dummy cluster membership
       UU = solve(t(U)%*%U) #projector
       Y = UU%*%t(U)%*%P #factor centroid
-          
+      
       # step 2 - update loadings
       m = (t(data.matrix(data))%*%(U%*%UU%*%t(U)-diag(n))%*%data.matrix(data))
       A = svd(m)$v[,c(1:ndim)]
       
       #checking convergence
-      Fi = norm(P-U%*%Y,"2")
+      Fi = norm(P-U%*%Y)
       imp = f0 - Fi
       f0 = Fi
     }
@@ -48,7 +48,7 @@ FactorialKM <- function(data,nclus,ndim,nstart=100,smartStart=F){
       Uold = U
       Aold = A
       Yold = Y
-      Fold=P
+      Fold = P
       indexold = data.frame(cluID)
     }
     

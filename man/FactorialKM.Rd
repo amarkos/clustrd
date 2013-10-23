@@ -18,7 +18,7 @@
   \item{criterion}{optimal value of the objective function}
 }
 \references{Vichi, M. and Kiers, H.A.L. (2001). Factorial k-means analysis for two-way data. Computational Statistics and Data Analysis, 37, 49-64.}
-\author{Markos, A. \email{<amarkos@gmail.com>}, Iodice D'Enza , A. \email{<iodicede@gmail.com>} and Van de Velden, M. \email{<vandevelden@ese.eur.nl>}}
+\author{Markos, A. \email{amarkos@gmail.com}, Iodice D'Enza , A. \email{iodicede@gmail.com} and Van de Velden, M. \email{vandevelden@ese.eur.nl}}
 \seealso{\code{\link{ReducedKM}}}
 \examples{
    data(macro)

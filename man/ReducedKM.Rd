@@ -18,7 +18,7 @@
   \item{criterion}{optimal value of the objective function}
 }
 \references{De Soete, G. and Carroll, J. D. (1994). K-means clustering in a low-dimensional Euclidean space. In Diday E. et al. (Eds.), New Approaches in Classification and Data Analysis, Heidelberg: Springer, 212-219.}
-\author{Markos, A. \email{<amarkos@gmail.com>}, Iodice D'Enza, A. \email{<iodicede@gmail.com>} and Van de Velden, M. \email{<vandevelden@ese.eur.nl>}}
+\author{Markos, A. \email{amarkos@gmail.com}, Iodice D'Enza, A. \email{iodicede@gmail.com} and Van de Velden, M. \email{vandevelden@ese.eur.nl}}
 \seealso{\code{\link{FactorialKM}}}
 \examples{
    data(macro)
