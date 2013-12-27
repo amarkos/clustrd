@@ -2,7 +2,7 @@
 \alias{ReducedKM}
 \title{ReducedKM}
 \description{Implements Reduced k-means (De Soete and Carroll, 1994) which combines k-means for clustering with PCA for dimension reduction.}
-\usage{ReducedKM(data, nclus, ndim, nstart = 100, smartStart = F)}
+\usage{ReducedKM(data, nclus, ndim, nstart = 100, smartStart = FALSE)}
 \arguments{
   \item{data}{quantitative dataset}
   \item{nclus}{number of clusters}
@@ -22,6 +22,7 @@
 \seealso{\code{\link{FactorialKM}}}
 \examples{
    data(macro)
+   macro = data.frame(scale(macro, center = TRUE, scale = TRUE))
    outr <- ReducedKM(macro,3,2,nstart=1,smartStart=TRUE)
    plotrd(outr,what=c("all","none"),obslabel=rownames(macro),density=FALSE)
 }

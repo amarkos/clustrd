@@ -2,7 +2,7 @@
 \alias{FactorialKM}
 \title{FactorialKM}
 \description{Implements Factorial k-means (Vichi and Kiers, 2001) which combines Principal Component Analysis for dimension reduction with k-means for clustering.}
-\usage{FactorialKM(data, nclus, ndim, nstart = 100, smartStart = F)}
+\usage{FactorialKM(data, nclus, ndim, nstart = 100, smartStart = FALSE)}
 \arguments{
   \item{data}{quantitative dataset}
   \item{nclus}{number of clusters}
@@ -22,6 +22,7 @@
 \seealso{\code{\link{ReducedKM}}}
 \examples{
    data(macro)
+   macro = data.frame(scale(macro, center = TRUE, scale = TRUE))
    outf <- FactorialKM(macro,3,2,nstart=1,smartStart=TRUE)
    plotrd(outf,what=c("all","none"),obslabel=rownames(macro),density=FALSE)
 }
