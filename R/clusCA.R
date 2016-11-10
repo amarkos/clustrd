@@ -1,4 +1,4 @@
-clusCA <- function(data,nclus,ndim,nstart=100,smartStart=NULL,seed=1234){
+clusCA <- function(data,nclus,ndim,nstart=100,smartStart=NULL,gamma = FALSE, seed=1234){
   #source("EmptyKmeans.r")
   #require("dummies")
   
@@ -87,7 +87,7 @@ clusCA <- function(data,nclus,ndim,nstart=100,smartStart=NULL,seed=1234){
       outK = try(kmeans(Yi,centers=Gi,nstart=100),silent=T)
       #empty clusters
       if(is.list(outK) == F){
-       # outK=EmptyKmeans(Yi,centers=Gi) 
+        # outK=EmptyKmeans(Yi,centers=Gi) 
         break 
       }
       Zki=outK$cluster
@@ -139,25 +139,32 @@ clusCA <- function(data,nclus,ndim,nstart=100,smartStart=NULL,seed=1234){
     
     fvec=c(fvec,objbef)
     if (varsi>maxinert){ #gamma
-      
       #    inert_sol=inert
       #    t_inert_sol=t_inert
-      
-      distB = sum(diag(t(Bns)%*%  Bns))
-      distG = sum(diag(t(Gi)%*% Gi))
-      gamma = ((K/Q)* distB/distG)^.25
-      
-      Bsol = (1/gamma)*Bns
-      Gsol = gamma*Gi
-      Ysol = gamma*Yi
-      
+     
+      if (gamma == TRUE) { 
+        distB = sum(diag(t(Bns)%*%  Bns))
+        distG = sum(diag(t(Gi)%*% Gi))
+        g = ((K/Q)* distB/distG)^.25
+        
+        Bsol = (1/g)*Bns
+        Gsol = g*Gi
+        Ysol = g*Yi
+      } else {
+        Bsol = Bns
+        Gsol = Gi
+        Ysol = Yi
+      }
       Csol = Zki
+      
       #  myG = pseudoinverse(t(Csol)%*% Csol)%*% t(Csol) %*% Ysol
       
       iters=iter
       maxinert=varsi
       
     }
+    
+    
     
     
   }
@@ -187,6 +194,7 @@ clusCA <- function(data,nclus,ndim,nstart=100,smartStart=NULL,seed=1234){
   #  out$expl_inertia=(inert/t_inert) # explained inertia
   out$csize=round((table(cluID)/sum( table(cluID)))*100,digits=1)
   out$odata=data.frame(lapply(data.frame(data),factor))
+  out$nstart = nstart
   class(out)="clusmca"
   return(out)
 }

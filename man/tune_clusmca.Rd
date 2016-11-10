@@ -8,7 +8,7 @@ This function facilitates the selection of the appropriate number of clusters an
 }
 \usage{
 tune_clusmca(data, nclusrange = 2:7, ndimrange = 2:4, method = "clusCA", 
-criterion = "asw", dst = "full", alpha = .5, nstart = 100, 
+criterion = "asw", dst = "full", alpha = .5, nstart = 10, 
 smartStart = NULL, seed = 1234)
 }
 \arguments{
@@ -30,7 +30,7 @@ smartStart = NULL, seed = 1234)
 \item{nclusbest}{The optimal number of cluster}
 \item{ndimbest}{The optimal number of dimensions}
 \item{critbest}{The optimal criterion value for \code{nclusbest} clusters and \code{ndimbest} dimensions}
-\item{critgrid}{Matrix of size \code{nclusrange x ndimrange} with criterion values for the specified range of numbers of clusters and numbers of dimensions (values are calculated for the number of clusters greater or equal to the number of dimensions; otherwise values are left blank)}
+\item{critgrid}{Matrix of size \code{nclusrange x ndimrange} with criterion values for the specified range of numbers of clusters and numbers of dimensions (values are calculated for the number of clusters greater than the number of dimensions; otherwise values are left blank)}
 }
 
 \seealso{

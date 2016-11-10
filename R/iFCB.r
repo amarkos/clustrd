@@ -1,4 +1,4 @@
-iFCB<- function(data,nclus=3,ndim=2,nstart=100,smartStart=NULL,seed=1234){
+iFCB<- function(data,nclus=3,ndim=2,nstart=100,smartStart=NULL,gamma = TRUE,seed=1234){
   #  require("dummies")
   #  source("EmptyKmeans.r")  
   
@@ -9,9 +9,6 @@ iFCB<- function(data,nclus=3,ndim=2,nstart=100,smartStart=NULL,seed=1234){
   n=nrow(data)
   
   dZ=as.matrix(dummy.data.frame(data,dummy.classes = "ALL"))
-  print(dZ[1:5,1:5])
-  dZ=as.matrix(dummy.data.frame((data),drop=F))
-  print(dZ[1:5,1:5])
   ndZ = ncol(dZ)
   
   best_f=1000000
@@ -42,8 +39,6 @@ iFCB<- function(data,nclus=3,ndim=2,nstart=100,smartStart=NULL,seed=1234){
     while((it<=itmax)&&(imp>ceps)){
       
       it=it+1 
-      #print("it")
-      #print(it)
       
       Fmat = t(C) %*% dZ #crossprod(C,dZ) #
       P=Fmat/sum(Fmat)
@@ -76,7 +71,7 @@ iFCB<- function(data,nclus=3,ndim=2,nstart=100,smartStart=NULL,seed=1234){
       if(is.list(outK)==F){
         #print("singleton")
         outK=EmptyKmeans(Y,centers=G)  
-      #  break
+        #  break
       }
       
       G=outK$centers
@@ -99,17 +94,19 @@ iFCB<- function(data,nclus=3,ndim=2,nstart=100,smartStart=NULL,seed=1234){
     if(f<=best_f){
       
       #####gamma scaling
-      distB = sum(diag(t(B)%*%  B))
-      distG = sum(diag(t(G)%*% G))
-      gamma = ((nclus/q)* distB/distG)^.25
-      
-      B = (1/gamma)*B
-      G = gamma*G
-      Y = gamma*Y
+      if (gamma == TRUE) {
+        distB = sum(diag(t(B)%*%  B))
+        distG = sum(diag(t(G)%*% G))
+        g = ((nclus/q)* distB/distG)^.25
+        
+        B = (1/g)*B
+        G = g*G 
+        Y = g*Y
+      }
       #########################
       
       
-   #   best_lam=lambda
+      #   best_lam=lambda
       best_f=f
       best_ngvec=ngvec	
       best_Y=Y
@@ -175,6 +172,7 @@ iFCB<- function(data,nclus=3,ndim=2,nstart=100,smartStart=NULL,seed=1234){
   # out$critvec=fvec
   out$csize=round((table(cluID)/sum( table(cluID)))*100,digits=1)
   out$odata=data.frame(lapply(data.frame(data),factor))
+  out$nstart = nstart
   class(out)="clusmca"
   return(out)
 }

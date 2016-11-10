@@ -10,7 +10,7 @@ This function implements Factorial K-means (Vichi and Kiers, 2001) and Reduced K
 
 \usage{
 cluspca(data, nclus, ndim, alpha = NULL, method = "RKM", 
-center = TRUE, scale = TRUE, rotation = "none", nstart = 100, 
+center = TRUE, scale = TRUE, rotation = "none", nstart = 10, 
 smartStart = NULL, seed = 1234)
 }
 
@@ -38,6 +38,7 @@ smartStart = NULL, seed = 1234)
 \item{csize}{Cluster size}
 \item{scale}{A copy of \code{scale} in the return object}
 \item{center}{A copy of \code{center} in the return object}
+\item{nstart}{A copy of \code{nstart} in the return object}
 \item{odata}{A copy of \code{data} in the return object}
 }
 \references{

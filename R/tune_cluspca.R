@@ -1,4 +1,4 @@
-tune_cluspca <- function(data, nclusrange = 2:7, ndimrange = 2:4, criterion = "asw", dst = "full", alpha = NULL, method = "RKM", center = TRUE, scale = TRUE, rotation = "none", nstart = 100, smartStart = NULL, seed = 1234){
+tune_cluspca <- function(data, nclusrange = 2:7, ndimrange = 2:4, criterion = "asw", dst = "full", alpha = NULL, method = "RKM", center = TRUE, scale = TRUE, rotation = "none", nstart = 10, smartStart = NULL, seed = 1234){
   
   critval = matrix(0,max(length(nclusrange)),max(length(ndimrange)))
   
@@ -6,26 +6,26 @@ tune_cluspca <- function(data, nclusrange = 2:7, ndimrange = 2:4, criterion = "a
   n = 1
   for (k in nclusrange) {
     for (d in ndimrange) {
-      #    if (k >= d) {
-      ##    outclusCA[[k]] <- clusCA(data=data, nclus = k, ndim = d,nstart = nstart,smartStart = smartStart, seed = seed)
-      print(paste('Running for',k,'clusters and',d,'dimensions...'))
-      outcluspca <- cluspca(data=data, nclus = k, ndim = d,alpha = alpha,method = method,  center = TRUE, scale = TRUE, rotation=rotation, nstart = nstart, smartStart = smartStart, seed = seed)
-      
-      if (criterion == "asw")
-      {
-        critval[m,n] <- clusval(outcluspca, dst = dst)$asw
+      if (k > d) {
+        ##    outclusCA[[k]] <- clusCA(data=data, nclus = k, ndim = d,nstart = nstart,smartStart = smartStart, seed = seed)
+        print(paste('Running for',k,'clusters and',d,'dimensions...'))
+        outcluspca <- cluspca(data=data, nclus = k, ndim = d,alpha = alpha,method = method,  center = TRUE, scale = TRUE, rotation=rotation, nstart = nstart, smartStart = smartStart, seed = seed)
+        
+        if (criterion == "asw")
+        {
+          critval[m,n] <- clusval(outcluspca, dst = dst)$asw
+        }
+        if (criterion == "ch")
+        {
+          critval[m,n] <- clusval(outcluspca, dst = dst)$ch
+        }
+        
+        if (criterion == "crit")
+        {
+          critval[m,n] <- outcluspca$criterion
+        }
+        
       }
-      if (criterion == "ch")
-      {
-        critval[m,n] <- clusval(outcluspca, dst = dst)$ch
-      }
-      
-      if (criterion == "crit")
-      {
-        critval[m,n] <- outcluspca$criterion
-      }
-      
-      #    }
       n = n +1
     }
     n = 1
@@ -45,10 +45,16 @@ tune_cluspca <- function(data, nclusrange = 2:7, ndimrange = 2:4, criterion = "a
   
   k.best <- nclusrange[indk.best]
   d.best <- ndimrange[indd.best]
-  outcluspcabest = cluspca(data = data, nclus = k.best, ndim = d.best,alpha = alpha, method = method,  center = TRUE, scale = TRUE, rotation= rotation, nstart = nstart, smartStart = smartStart, seed = seed)
+  outcluspcabest = cluspca(data = data, nclus = k.best, ndim = d.best, alpha = alpha, method = method,  center = TRUE, scale = TRUE, rotation = rotation, nstart = nstart, smartStart = smartStart, seed = seed)
   rownames(critval) = c(nclusrange)
   colnames(critval) = c(ndimrange)
   
-  out <- list(cluspcaobj = outcluspcabest, nclusbest = k.best, ndimbest = d.best, critbest = round(critval[indk.best, indd.best],3), critgrid  = round(critval,3))
+  crit.best = round(critval[indk.best, indd.best],3) 
+  crit.grid  = round(critval,3)
+  
+  crit.grid[upper.tri(as.matrix(crit.grid),diag=TRUE)] <- "   "
+  crit.grid = as.data.frame(crit.grid)
+  
+  out <- list(cluspcaobj = outcluspcabest, nclusbest = k.best, ndimbest = d.best, critbest = crit.best, critgrid  = crit.grid)
   out
 }

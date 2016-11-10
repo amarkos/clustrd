@@ -1,4 +1,4 @@
-cluspca <- function(data,nclus,ndim,alpha=NULL,method="RKM",center = TRUE, scale = TRUE, rotation="none",nstart=100,smartStart=NULL,seed=1234)
+cluspca <- function(data,nclus,ndim,alpha=NULL,method="RKM",center = TRUE, scale = TRUE, rotation="none",nstart=10,smartStart=NULL,seed=1234)
 {
   #require(psych)
   #  source("orth.r")
@@ -46,10 +46,11 @@ cluspca <- function(data,nclus,ndim,alpha=NULL,method="RKM",center = TRUE, scale
     G = data%*%A
     Y = pseudoinverse(t(U)%*%U)%*%t(U)%*%G
     f = alpha*ssq(data - G%*%t(A))+(1-alpha)*ssq(data%*%A-U%*%Y)
+    f = as.numeric(f) #fixes convergence issue 01 Nov 2016
     fold = f + 2 * conv*f
     iter = 0
-    
     #iterative part
+   
     while (f<fold-conv*f) {
       fold=f
       iter=iter+1
@@ -72,7 +73,9 @@ cluspca <- function(data,nclus,ndim,alpha=NULL,method="RKM",center = TRUE, scale
       Y = pseudoinverse(t(U)%*%U)%*%t(U)%*%G
       # criterion
       f = alpha*ssq(data - G%*%t(A))+(1-alpha)*ssq(data%*%A-U%*%Y)
+  
     }
+   
     func[run] = f
     #fpXunc[run]=fpX
     FF[[run]] = G
@@ -95,6 +98,7 @@ cluspca <- function(data,nclus,ndim,alpha=NULL,method="RKM",center = TRUE, scale
   centroid = centroid[as.integer(names(aa)),]
   #######################
   
+ 
   ### rotation options ###
   if (rotation == "varimax") {
     AA[[mi]] = varimax(AA[[mi]])$loadings
@@ -135,6 +139,7 @@ cluspca <- function(data,nclus,ndim,alpha=NULL,method="RKM",center = TRUE, scale
   out$odata = data.frame(odata)
   out$scale = scale
   out$center = center
+  out$nstart = nstart
   class(out) = "cluspca"
   return(out)   
 }

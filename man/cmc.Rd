@@ -30,6 +30,5 @@ Lim, T.-S., Loh, W.-Y. & Shih, Y.-S. (1999). A Comparison of Prediction Accuracy
 }
 \examples{
 data(cmc)
-## maybe str(cmc) ; plot(cmc) ...
 }
 \keyword{datasets}

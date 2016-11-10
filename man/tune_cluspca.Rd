@@ -10,7 +10,7 @@ This function facilitates the selection of the appropriate number of clusters an
 \usage{
 tune_cluspca(data, nclusrange = 2:7, ndimrange = 2:4, criterion = "asw", 
 dst = "full", alpha = NULL, method = "RKM", center = TRUE, scale = TRUE, 
-rotation = "none", nstart = 100, smartStart = NULL, seed = 1234)
+rotation = "none", nstart = 10, smartStart = NULL, seed = 1234)
 }
 
 \arguments{
@@ -35,7 +35,7 @@ for promax rotation \code{(default = "none")}}
 \item{nclusbest}{The optimal number of cluster}
 \item{ndimbest}{The optimal number of dimensions}
 \item{critbest}{The optimal criterion value for \code{nclusbest} clusters and \code{ndimbest} dimensions}
-\item{critgrid}{Matrix of size \code{nclusrange x ndimrange} with criterion values for the specified range of numbers of clusters and numbers of dimensions (values are calculated for the number of clusters greater or equal to the number of dimensions; otherwise values are left blank)}
+\item{critgrid}{Matrix of size \code{nclusrange x ndimrange} with criterion values for the specified range of numbers of clusters and numbers of dimensions (values are calculated for the number of clusters greater than the number of dimensions; otherwise values are left blank)}
 }
 
 
