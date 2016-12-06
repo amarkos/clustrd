@@ -20,7 +20,7 @@ nstart = 10, smartStart = NULL, gamma = TRUE, seed = 1234)
   \item{alpha}{Non-negative scalar to adjust for the relative importance of of MCA and K-means in the solution (default = .5). Works only in combination with \code{method = "MCAk"}}
   \item{nstart}{Number of random starts}
   \item{smartStart}{If \code{NULL} then a random cluster membership vector is generated. Alternatively, a cluster membership vector can be provided as a starting solution}
-  \item{gamma}{Scaling parameter that leads to similar spread in the object and variable scores (default = \code{TRUE})}
+  \item{gamma}{Scaling parameter that leads to a similar spread in the object and attribute points (default = \code{TRUE})}
   \item{seed}{An integer that is used as argument by \code{set.seed()} for offsetting the random number generator when \code{smartStart = NULL}. The default value is 1234}
 }
 

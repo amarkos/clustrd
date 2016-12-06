@@ -15,7 +15,7 @@ rotation = "none", nstart = 10, smartStart = NULL, seed = 1234)
 
 \arguments{
   \item{data}{Continuous dataset}
-  \item{nclusrange}{An integer vector with the range of numbers of clusters which are to be compared by the cluster validity criteria. Note: the number of clusters should be greater than one}
+  \item{nclusrange}{An integer vector with the range of numbers of clusters which are to be compared by the cluster validity criteria}
   \item{ndimrange}{An integer vector with the range of dimensions which are to be compared by the cluster validity criteria}
   \item{criterion}{One of \code{asw}, \code{ch} or \code{crit}. Determines whether average silhouette width, Calinski-Harabasz index or objective value of the selected method is used \code{(default = "asw")}}
   \item{dst}{Specifies the data used to compute the distances between objects. Options are \code{full} for the original data (after possible scaling) and \code{low} for the object scores in the low-dimensional space \code{(default = "full")}}
@@ -35,7 +35,7 @@ for promax rotation \code{(default = "none")}}
 \item{nclusbest}{The optimal number of cluster}
 \item{ndimbest}{The optimal number of dimensions}
 \item{critbest}{The optimal criterion value for \code{nclusbest} clusters and \code{ndimbest} dimensions}
-\item{critgrid}{Matrix of size \code{nclusrange x ndimrange} with criterion values for the specified range of numbers of clusters and numbers of dimensions (values are calculated for the number of clusters greater than the number of dimensions; otherwise values are left blank)}
+\item{critgrid}{Matrix of size \code{nclusrange x ndimrange} with criterion values for the specified ranges of numbers of clusters and numbers of dimensions (values are calculated for the number of clusters greater than the number of dimensions; otherwise values are left blank)}
 }
 
 

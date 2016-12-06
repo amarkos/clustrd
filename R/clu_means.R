@@ -56,7 +56,7 @@ clu_means<-function(x, id, disp=TRUE, center=TRUE, scale=TRUE){
 #  if (scale == T) {
 #    pco=pco+geom_vline(xintercept=1:p,alpha=.5) + xlab("variables") + ylab("z-score") 
 #  } else {
-    pco=pco+geom_vline(xintercept=1:p,alpha=.1) + xlab("") + ylab("mean") 
+    pco=pco+geom_vline(xintercept=1:p,alpha=.1) + xlab("") + ylab("mean") + theme_classic()
 #  }
   
   # for(jj in levels(id)){

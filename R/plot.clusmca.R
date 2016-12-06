@@ -24,7 +24,7 @@ plot.clusmca<-function(x, dims = c(1,2), disp = TRUE, cludesc = FALSE, what = c(
     lab2=unlist(lab1b)
     attlabs=paste(lab1,lab2,sep=".")
   }
- 
+  
   
   
   xallmax=max(max(x$attcoord[,dim1]),max(x$obscoord[,dim1]))
@@ -44,10 +44,10 @@ plot.clusmca<-function(x, dims = c(1,2), disp = TRUE, cludesc = FALSE, what = c(
   xallmax=xallmin+all_range
   yallmax=yallmin+all_range
   # extend borders to show all points
-#  xallmax = xallmax + 0.01*all_range
-#  xallmin = xallmin - 0.01*all_range
-#  yallmax = yallmax + 0.01*all_range
-#  yallmin = yallmin - 0.01*all_range
+  #  xallmax = xallmax + 0.01*all_range
+  #  xallmin = xallmin - 0.01*all_range
+  #  yallmax = yallmax + 0.01*all_range
+  #  yallmin = yallmin - 0.01*all_range
   #
   xattmax=max(x$attcoord[,dim1])
   xattmin=min(x$attcoord[,dim1])
@@ -145,10 +145,10 @@ plot.clusmca<-function(x, dims = c(1,2), disp = TRUE, cludesc = FALSE, what = c(
     a=a+geom_text(data=group_df,colour="black",aes(label=gr))
     
     # 
-     a = a + geom_point(data=att_df,aes(x=d1,y=d2),alpha=.5,size=.25,na.rm=TRUE) #+theme_bw()+xlab("")+ylab("")
-     a=a+geom_text(data=subset(att_df,act=="outer"),aes( label = attnam),size=mysize)#,segment.size = 0.1)
-     a=a+geom_text(data=subset(att_df,act!="outer"),aes( label = attnam),size=mysize*.8)#,segment.size = 0.01)
-     a=a+geom_vline(xintercept=0)+geom_hline(yintercept=0)
+    a = a + geom_point(data=att_df,aes(x=d1,y=d2),alpha=.5,size=.25,na.rm=TRUE) #+theme_bw()+xlab("")+ylab("")
+    a=a+geom_text(data=subset(att_df,act=="outer"),aes( label = attnam),size=mysize)#,segment.size = 0.1)
+    a=a+geom_text(data=subset(att_df,act!="outer"),aes( label = attnam),size=mysize*.8)#,segment.size = 0.01)
+    a=a+geom_vline(xintercept=0)+geom_hline(yintercept=0)
     
     if(disp==F){
       ggsave(filename = paste("K",deparse(K),"Map.pdf",sep=""),a,height=8 , width=8)
@@ -158,11 +158,11 @@ plot.clusmca<-function(x, dims = c(1,2), disp = TRUE, cludesc = FALSE, what = c(
     }
   }
   
-  if(cludesc==T){
+  if(cludesc==TRUE){
     
     cnames=paste("C",1:K,sep="")
     cnm=paste(cnames,": ",x$csize,"%",sep="")
-
+    
     if (length(attlabs) > 20) {
       
       ffew = 20
@@ -172,7 +172,7 @@ plot.clusmca<-function(x, dims = c(1,2), disp = TRUE, cludesc = FALSE, what = c(
       plotGroups=outOfIndependence(x$odata,x$cluID,nolabs=T,attlabs,fixmarg=T,textSize=1.5,segSize=1.5,minx=myminx,maxx=mymaxx)
       
       if(disp==F){
-      #  require("grid")
+        #  require("grid")
         for(jjj in 1:K){
           TopplotGroups$G[[jjj]]=TopplotGroups$G[[jjj]]+theme_bw()+ggtitle(cnm[jjj])
           plotname=paste(deparse(substitute(x)),"G",deparse(jjj),"picInpic.pdf",sep="")
@@ -182,7 +182,7 @@ plot.clusmca<-function(x, dims = c(1,2), disp = TRUE, cludesc = FALSE, what = c(
           dev.off()
         }
       }else{
-      
+        
         # grid.newpage()
         for(jjj in 1:K){
           TopplotGroups$G[[jjj]]=TopplotGroups$G[[jjj]]+theme_bw()+ggtitle(cnm[jjj])
@@ -202,7 +202,7 @@ plot.clusmca<-function(x, dims = c(1,2), disp = TRUE, cludesc = FALSE, what = c(
       
       
       if(disp==F){
-      #  require("grid")
+        #  require("grid")
         for(jjj in 1:K){
           TopplotGroups$G[[jjj]]=TopplotGroups$G[[jjj]]+theme_bw()+ggtitle(cnm[jjj])
           plotname=paste(deparse(substitute(x)),"G",deparse(jjj),".pdf",sep="")

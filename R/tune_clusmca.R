@@ -2,7 +2,6 @@ tune_clusmca <- function(data, nclusrange = 2:7, ndimrange = 2:4, method = "clus
   
  # outclusmca = list()
   critval = matrix(0,max(length(nclusrange)),max(length(ndimrange)))
-  
   m = 1
   n = 1
  # if ((method == "clusCA") | (method == "iFCB")) {    #for Cluster CA or iFCB return missing when k <= d
@@ -11,8 +10,7 @@ tune_clusmca <- function(data, nclusrange = 2:7, ndimrange = 2:4, method = "clus
         if (k > d) {
           ##    outclusCA[[k]] <- clusCA(data=data, nclus = k, ndim = d,nstart = nstart,smartStart = smartStart, seed = seed)
           print(paste('Running for',k,'clusters and',d,'dimensions...'))
-          outclusmca <- clusmca(data = data, nclus = k, ndim = d,method = method, alpha = alpha, nstart = nstart,smartStart = smartStart, seed = seed)
-          
+          outclusmca <- clusmca(data = data, nclus = k, ndim = d, method = method, alpha = alpha, nstart = nstart,smartStart = smartStart, seed = seed)
           if (criterion == "asw")
           {
             critval[m,n] <- clusval(outclusmca, dst = dst)$asw
@@ -84,7 +82,7 @@ tune_clusmca <- function(data, nclusrange = 2:7, ndimrange = 2:4, method = "clus
   crit.best = round(critval[indk.best, indd.best],3) 
   crit.grid  = round(critval,3)
   
-  crit.grid[upper.tri(as.matrix(crit.grid),diag=TRUE)] <- "   "
+  crit.grid[upper.tri(as.matrix(crit.grid))] <- "   "
   crit.grid = as.data.frame(crit.grid)
   out <- list(clusmcaobj = outclusmcabest, nclusbest = k.best, ndimbest = d.best, critbest = crit.best, critgrid  = crit.grid)
   out
