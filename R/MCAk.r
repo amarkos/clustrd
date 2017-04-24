@@ -1,16 +1,11 @@
-MCAk <- function(data,nclus=3,ndim=2,alpha=.5,nstart=100,smartStart=NULL, seed=1234){
-  #  require("corpcor")
-  #  require("dummies")
-  #  source("EmptyKmeans.r")
+MCAk <- function(data, nclus = 3, ndim = 2, alphak = .5, nstart = 100, smartStart=NULL,gamma = TRUE, seed=1234){
+
   zz = as.matrix(dummy.data.frame(data,dummy.classes = "ALL"))
   # data = data.matrix(data)
   data=data.frame(data)
-  # minobs = min(data)
-  #  maxobs = max(data)
   n = nrow(data)
   zitem = ncol(data)            
   zncati=sapply(data.frame(data), function(x) length(unique(x))) #apply(data,2,max)
-  zncat = sum(zncati)  
   oner = matrix(1,n,1)
   muz  = colMeans(zz)
   z = zz - oner %*% muz  
@@ -22,6 +17,10 @@ MCAk <- function(data,nclus=3,ndim=2,alpha=.5,nstart=100,smartStart=NULL, seed=1
   Pz = z %*% invsqDr
   PPz = t(Pz) %*% Pz
   
+  # evdPz = eigen(PPz)
+  #  V=evdPz$vectors[,1:ndim]
+  #  D=diag(sqrt(evdPz$values[1:ndim]))
+  
   svdPz = svd(PPz)
   V = svdPz$v
   D = diag(svdPz$d)
@@ -30,7 +29,7 @@ MCAk <- function(data,nclus=3,ndim=2,alpha=.5,nstart=100,smartStart=NULL, seed=1
   Fm=Pz %*% V %*% invsqD
   F0 = Fm[, 1:ndim]
   oldf=1e+06
-  # fvec=c()
+
   for(b in 1:nstart){
     Fv={}
     Fm = F0
@@ -52,15 +51,14 @@ MCAk <- function(data,nclus=3,ndim=2,alpha=.5,nstart=100,smartStart=NULL, seed=1
     imp = 1e+05
     f0 = 1e+05
     
-    
     while((it <= itmax ) && ( imp > ceps ) ){
       it=it+1
-  
+      
       ####################################################################
       ## STEP 1: update of U #############################################
       ####################################################################
       #use Lloyd's k-means algorithm to get the results of Hwang and Takane (2006)
-  #     outK=try(kmeans(Fm,centers=center,algorithm="Lloyd",nstart=100),silent=T)
+      #     outK=try(kmeans(Fm,centers=center,algorithm="Lloyd",nstart=100),silent=T)
       outK = try(kmeans(Fm,centers=center,nstart=100),silent=T)
       if(is.list(outK)==F){
         outK = EmptyKmeans(Fm,centers=center)  
@@ -71,14 +69,12 @@ MCAk <- function(data,nclus=3,ndim=2,alpha=.5,nstart=100,smartStart=NULL, seed=1
       U = dummy(index)
       U0=U-oner %*% colMeans(U)
       uu = colSums(t(U)%*% U)
-      Dru=diag(c(rr,uu))
-      sqDru=diag(sqrt(c(rr,uu)))
       invsqDru=diag(1/sqrt(c(rr,uu)))
       
       ####################################################################
       ## STEP 2: update of Fm and Wj ######################################
       ####################################################################
-      MU = cbind(alpha*M,(1-alpha)*U0)
+      MU = cbind(alphak*M,(1-alphak)*U0)
       Pzu = MU %*% invsqDru
       
       #  wzero=(which(Pzu=="NaN",arr.ind=T)) #Time-consuming, replaced 02.05.16
@@ -114,7 +110,7 @@ MCAk <- function(data,nclus=3,ndim=2,alpha=.5,nstart=100,smartStart=NULL, seed=1
       }
       ft2 = sum(diag((t(Fm) %*% Fm) - (t(Fm) %*% U %*% center)))
       #check again
-      f =  alpha*ft1 + (1-alpha)*ft2
+      f =  alphak*ft1 + (1-alphak)*ft2
       
       imp=f0-f
       f0=f
@@ -124,15 +120,15 @@ MCAk <- function(data,nclus=3,ndim=2,alpha=.5,nstart=100,smartStart=NULL, seed=1
     if (f <= oldf){
       
       #####gamma scaling
-   #   if (gamma == TRUE) {
-    #    distB = sum(diag(t(A)%*%  A))
-    #    distG = sum(diag(t(center)%*% center))
-  #    = ((nclus/zitem)* distB/distG)^.25
+      if (gamma == TRUE) {
+        distB = sum(diag(t(A)%*%  A))
+        distG = sum(diag(t(center)%*% center))
+        g = ((nclus/zitem)* distB/distG)^.25
         
-    #    A = (1/g)*A
-   #     center = g*center #is this needed
-  #      Fm = g*Fm
-   #   }
+        A = (1/g)*A
+        center = g*center #is this needed
+        Fm = g*Fm
+      }
       #########################
       
       oldF = Fm
@@ -154,10 +150,12 @@ MCAk <- function(data,nclus=3,ndim=2,alpha=.5,nstart=100,smartStart=NULL, seed=1
   # it=itold
   center=centerold
   
-  #library(plyr)
   ##reorder according to cluster size
-  csize = round((table(cluID)/sum( table(cluID)))*100,digits=2)
-  aa = sort(csize,decreasing = TRUE)
+  #csize = round((table(cluID)/sum( table(cluID)))*100,digits=2)
+  #aa = sort(csize,decreasing = TRUE)
+  size = table(cluID)
+  aa = sort(size,decreasing = TRUE)
+  
   cluID = mapvalues(cluID, from = as.integer(names(aa)), to = as.integer(names(table(cluID))))
   #reorder centroids
   center = center[as.integer(names(aa)),]
@@ -165,10 +163,11 @@ MCAk <- function(data,nclus=3,ndim=2,alpha=.5,nstart=100,smartStart=NULL, seed=1
   out$obscoord=Fm # observations coordinates 
   out$attcoord=A # attributes coordinates 
   out$centroid=center # centroids
+  cluID = as.integer(cluID)
+  names(cluID) = rownames(data) 
   out$cluID=cluID #as.numeric(index) # cluster membership
   out$criterion=f # criterion
-  #  out$iters=it # number of iterations
-  out$csize=round((table(cluID)/sum( table(cluID)))*100,digits=1)
+  out$size=as.integer(aa)  #round((table(cluID)/sum( table(cluID)))*100,digits=1)
   out$odata=data.frame(lapply(data.frame(data),factor))
   out$nstart = nstart
   class(out)="clusmca"

@@ -1,4 +1,22 @@
-tune_cluspca <- function(data, nclusrange = 2:7, ndimrange = 2:4, criterion = "asw", dst = "full", alpha = NULL, method = "RKM", center = TRUE, scale = TRUE, rotation = "none", nstart = 10, smartStart = NULL, seed = 1234){
+tune_cluspca <- function(data, nclusrange = 2:7, ndimrange = 2:4, criterion = "asw", dst = "full", alpha = NULL, method = "RKM", center = TRUE, scale = TRUE, rotation = "none", nstart = 100, smartStart = NULL, seed = 1234){
+  
+  criterion <- match.arg(criterion, c("asw", "ASW","ch","CH","crit","CRIT"), several.ok = T)[1]
+  criterion <- tolower(criterion)
+  
+  dst <- match.arg(dst, c("full", "FULL","low","LOW","Low","Full"), several.ok = T)[1]
+  dst <- tolower(dst)
+  
+  method <- match.arg(method, c("RKM", "rkm","rKM","FKM", "fkm","fKM"), several.ok = T)[1]
+  method <- toupper(method)
+  
+  if (is.null(alpha) == TRUE)
+  {  
+    if (method == "RKM") {
+      alpha = .5
+    } else if (method == "FKM") {
+      alpha = 0
+    }
+  }
   
   critval = matrix(0,max(length(nclusrange)),max(length(ndimrange)))
   
@@ -45,16 +63,17 @@ tune_cluspca <- function(data, nclusrange = 2:7, ndimrange = 2:4, criterion = "a
   
   k.best <- nclusrange[indk.best]
   d.best <- ndimrange[indd.best]
-  outcluspcabest = cluspca(data = data, nclus = k.best, ndim = d.best, alpha = alpha, method = method,  center = TRUE, scale = TRUE, rotation = rotation, nstart = nstart, smartStart = smartStart, seed = seed)
+  outcluspcabest = cluspca(data = data, nclus = k.best, ndim = d.best, alpha = alpha, method = method,  center = center, scale = scale, rotation = rotation, nstart = nstart, smartStart = smartStart, seed = seed)
   rownames(critval) = c(nclusrange)
   colnames(critval) = c(ndimrange)
   
   crit.best = round(critval[indk.best, indd.best],3) 
   crit.grid  = round(critval,3)
   
-  crit.grid[upper.tri(as.matrix(crit.grid),diag=TRUE)] <- "   "
+  crit.grid[is.na(crit.grid)]=''
   crit.grid = as.data.frame(crit.grid)
   
-  out <- list(cluspcaobj = outcluspcabest, nclusbest = k.best, ndimbest = d.best, critbest = crit.best, critgrid  = crit.grid)
+  out <- list(clusobj = outcluspcabest, nclusbest = k.best, ndimbest = d.best, critbest = crit.best, critgrid  = crit.grid)
+  class(out) = "tune_cluspca"
   out
 }

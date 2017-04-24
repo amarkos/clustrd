@@ -1,37 +1,54 @@
 \name{plot.cluspca}
 \alias{plot.cluspca}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{
 Plotting function for \code{cluspca()} output.
 }
 \description{
-Plotting function that creates a \code{ggplot2} scatterplot of the objects, a correlation circle of the variables or a biplot of both objects and variables.}
+Plotting function that creates a scatterplot of the objects, a correlation circle of the variables or a biplot of both objects and variables. Optionally, it returns a parallel coordinate plot showing cluster means.}
 
 \usage{
-\method{plot}{cluspca}(x, dims = c(1, 2), disp = TRUE, cludesc = FALSE, what = c(TRUE,TRUE), ...)
+\method{plot}{cluspca}(x, dims = c(1, 2), cludesc = FALSE, what = c(TRUE,TRUE), ...)
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
   \item{x}{Object returned by \code{cluspca()}}
   \item{dims}{Numerical vector of length 2 indicating the dimensions to plot on horizontal and vertical axes respectively; default is first dimension horizontal and
 second dimension vertical}
-  \item{disp}{A logical value indicating whether the plots are shown in the \code{R} window or saved as PDF files in the working directory \code{(default = TRUE)}}
-  \item{what}{Vector of two logical values specifying the contents of the plots. First entry indicates whether a scatterplot of the objects is displayed and the second entry whether a correlation circle of the variables is displayed. The default is \code{c(TRUE, TRUE)} and the resultant plot is a biplot of both objects and variables}
-  \item{cludesc}{A logical value indicating if a parallel plot showing cluster means is produced (default = \code{FALSE)}}
+  \item{what}{Vector of two logical values specifying the contents of the plots. First entry indicates whether a scatterplot of the objects and cluster centroids is displayed and the second entry whether a correlation circle of the variables is displayed. The default is \code{c(TRUE, TRUE)} and the resultant plot is a biplot of both objects and variables}
+  \item{cludesc}{A logical value indicating if a parallel coordinate plot showing cluster means is produced (default = \code{FALSE)}}
   \item{...}{Further arguments to be transferred to \code{cluspca()}}
 }
+\value{
+\item{map}{A ggplot2 scatterplot of the solution obtained via \code{cluspca()} that can be further customized using the \pkg{ggplot2} package}
+\item{parcoord}{A ggplot2 parallel coordinate plot showing cluster means that can be further customized using the \pkg{ggplot2} package}
+}
 \references{
-De Soete, G. and Carroll, J. D. (1994). K-means clustering in a low-dimensional Euclidean space. In Diday E. et al. (Eds.), \emph{New Approaches in Classification and Data Analysis}, Heidelberg: Springer, 212-219.
+De Soete, G., and Carroll, J. D. (1994). K-means clustering in a low-dimensional Euclidean space. In Diday E. et al. (Eds.), \emph{New Approaches in Classification and Data Analysis}, Heidelberg: Springer, 212-219.
 
-Vichi, M. and Kiers, H.A.L. (2001). Factorial K-means analysis for two-way data. \emph{Computational Statistics and Data Analysis}, 37, 49-64.
+Vichi, M., and Kiers, H.A.L. (2001). Factorial K-means analysis for two-way data. \emph{Computational Statistics and Data Analysis}, 37, 49-64.
 }
 \seealso{
 \code{\link{plot.clusmca}}
 }
 \examples{
+data("macro")
+#Factorial K-means (3 clusters in 2 dimensions) after 100 random starts
+outFKM = cluspca(macro, 3, 2, method = "FKM", rotation = "varimax")
+#Scatterplot (dimensions 1 and 2) and cluster description plot
+plot(outFKM, cludesc = TRUE)
+
 data("iris", package = "datasets")
+#Compromise solution between PCA and Reduced K-means
+#on the iris dataset (3 clusters in 2 dimensions) after 100 random starts
 outclusPCA = cluspca(iris[,-5], 3, 2, alpha = 0.3, rotation = "varimax")
 table(outclusPCA$cluID,iris[,5])
-plot(outclusPCA, cludesc = TRUE)
+#Save the ggplot2 scatterplot
+map = plot(outclusPCA)$map
+#Customization (adding titles)
+map + ggtitle(paste("A compromise solution between RKM and FKM on the iris: 
+3 clusters of sizes ", paste(outclusPCA$size, 
+collapse = ", "),sep = "")) + xlab("Dimension 1") + ylab("Dimension 2") + 
+theme(plot.title = element_text(size = 10, face = "bold", hjust = 0.5))
 }
 

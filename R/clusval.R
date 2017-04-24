@@ -17,6 +17,6 @@ clusval<-function(x,dst="full"){
   out$ch=clu_res$ch
   out$asw=clu_res$avg.silwidth
   #out$crit=x$criterion
-  
+  class(out) = "clusval"
   return(out)
 }

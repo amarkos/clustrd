@@ -44,7 +44,7 @@ outOfIndependence=function(data,Gvec,labs,nolabs=F,fixmarg=T,firstfew=0,minx=-2.
     #topfew=which(abs(devP[,jj]*sqrt(n))>1)
     #print(labs[topfew])
     dfP[[jj]]=data.frame(value=devP[,jj]*sqrt(n),place=1:nrow(devP),lbls=labs)
-     sortOp[[jj]]=sort(abs(dfP[[jj]]$value),decreasing=T,index.return=T)
+    sortOp[[jj]]=sort(abs(dfP[[jj]]$value),decreasing=T,index.return=T)
     #   sortOp2=sort(abs(dfP2$value),decreasing=T,index.return=T)
     #   sortOp3=sort(abs(dfP3$value),decreasing=T,index.return=T)  
     
@@ -63,7 +63,7 @@ outOfIndependence=function(data,Gvec,labs,nolabs=F,fixmarg=T,firstfew=0,minx=-2.
       bbp=bbp+theme(legend.position="none")+xlab("")+ylab("")+xlim(c(minx,maxx))
       bbp=bbp+theme(axis.text.x  = element_text(size=textSize),axis.text.y  = element_text(size=textSize))
       if(firstfew==0){bbp=bbp+theme(axis.line=element_blank(),axis.ticks = element_blank())}
-      }
+    }
     else{
       
       bbp=bbp+geom_segment(data=dfP[[jj]],aes(x=0,xend=value,y=newplace,yend=newplace),colour=colorPal[jj],size=segSize,alpha=.25)

@@ -8,7 +8,7 @@ EmptyKmeans<-function(data,centers){
     start=ceiling(runif(K)*n)
     centers=data[start,]
   }else{
-  K=nrow(centers)
+    K=nrow(centers)
   }
   gvec=matrix(1,nrow=n,1)
   it=0
@@ -16,56 +16,56 @@ EmptyKmeans<-function(data,centers){
   oldf=10000000
   gmat=c()
   while(it<=maxiter){
-  it=it+1
-  
-  for(i in 1:n){
-    assignVec=c()
-    for(j in 1:K){
-      a=data[i,]
-      b=centers[j,]
-      assignVec[j]=dist(rbind(a,b))
+    it=it+1
+    
+    for(i in 1:n){
+      assignVec=c()
+      for(j in 1:K){
+        a=data[i,]
+        b=centers[j,]
+        assignVec[j]=dist(rbind(a,b))
       }
-  gvec[i]=which.min(assignVec)
-  
-  }
-  
-  
-  C=dummy(gvec)
-  G=solve(t(C)%*% C)%*% t(C) %*% data
-  CG=C%*%G
-  if(length( table(gvec))!=K){
-    #print("there is an empty cluster")
-    who_empty=setdiff(1:K,unique(gvec))
-    #print(who_empty)
-    allDist=sqrt(apply((data-CG)^2,1,sum))
-    for (emp in 1:length(who_empty)){
-    far=which.min(allDist)
-    while(length(which(gvec==gvec[far]))==1){
-      allDist=allDist[-far]
-      far=which.min(allDist)
+      gvec[i]=which.min(assignVec)
+      
     }
-    gvec[far]=who_empty[emp]
-    #print(unique(gvec))
-    allDist=allDist[-far]
-    }
+    
     
     C=dummy(gvec)
     G=solve(t(C)%*% C)%*% t(C) %*% data
     CG=C%*%G
+    if(length( table(gvec))!=K){
+      #print("there is an empty cluster")
+      who_empty=setdiff(1:K,unique(gvec))
+      #print(who_empty)
+      allDist=sqrt(apply((data-CG)^2,1,sum))
+      for (emp in 1:length(who_empty)){
+        far=which.min(allDist)
+        while(length(which(gvec==gvec[far]))==1){
+          allDist=allDist[-far]
+          far=which.min(allDist)
+        }
+        gvec[far]=who_empty[emp]
+        #print(unique(gvec))
+        allDist=allDist[-far]
+      }
+      
+      C=dummy(gvec)
+      G=solve(t(C)%*% C)%*% t(C) %*% data
+      CG=C%*%G
+    }
+    gmat=cbind(gmat,gvec)
+    f= sum(diag(t(data-CG) %*% (data-CG)))
+    #print(f)
+    if((oldf-f) <= 0){
+      out$cluster=gvec
+      out$centers=G
+      out$f=f
+      break
+    }
+    oldf=f
+    centers=G
+    
   }
-  gmat=cbind(gmat,gvec)
-  f= sum(diag(t(data-CG) %*% (data-CG)))
-  #print(f)
-  if((oldf-f) <= 0){
-    out$cluster=gvec
-    out$centers=G
-    out$f=f
-    break
-  }
-  oldf=f
-  centers=G
   
-  }
-
-out
+  out
 }

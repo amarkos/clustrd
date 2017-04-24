@@ -13,7 +13,6 @@ clusCA <- function(data,nclus,ndim,nstart=100,smartStart=NULL,gamma = FALSE, see
   errors=0
   data=data.frame(data)
   Z=dummy.data.frame(data,dummy.classes = "ALL") # The original super indicator
-  #data=data.matrix(data)
   n=nrow(Z)
   Q=ncol(Z)
   #  vars=c()
@@ -94,7 +93,6 @@ clusCA <- function(data,nclus,ndim,nstart=100,smartStart=NULL,gamma = FALSE, see
       Gi=outK$centers
       
       Zki=dummy(Zki)
-      
       Dk=t(Zki) %*% Zki        
       Dks=Dk^(.5)                  # New Dch weights
       Dksi=pseudoinverse(Dks)
@@ -141,7 +139,7 @@ clusCA <- function(data,nclus,ndim,nstart=100,smartStart=NULL,gamma = FALSE, see
     if (varsi>maxinert){ #gamma
       #    inert_sol=inert
       #    t_inert_sol=t_inert
-     
+      
       if (gamma == TRUE) { 
         distB = sum(diag(t(Bns)%*%  Bns))
         distG = sum(diag(t(Gi)%*% Gi))
@@ -178,8 +176,10 @@ clusCA <- function(data,nclus,ndim,nstart=100,smartStart=NULL,gamma = FALSE, see
   
   #library(plyr)
   ##reorder cluster membership according to cluster size
-  csize = round((table(cluID)/sum( table(cluID)))*100,digits=2)
-  aa = sort(csize,decreasing = TRUE)
+  #csize = round((table(cluID)/sum( table(cluID)))*100,digits=2)
+  #aa = sort(csize,decreasing = TRUE)
+  size = table(cluID)
+  aa = sort(size,decreasing = TRUE)
   cluID = mapvalues(cluID, from = as.integer(names(aa)), to = as.integer(names(table(cluID))))
   #reorder centroids
   Gsol = Gsol[as.integer(names(aa)),]
@@ -188,11 +188,13 @@ clusCA <- function(data,nclus,ndim,nstart=100,smartStart=NULL,gamma = FALSE, see
   out$obscoord=Ysol # observations coordinates
   out$attcoord=Bsol # attributes coordinates
   out$centroid=Gsol # centroids
+  cluID = as.integer(cluID)
+  names(cluID) = rownames(data) 
   out$cluID=cluID   # cluster membership
   out$criterion=maxinert # criterion
   #  out$iters=iters # number of iterations
   #  out$expl_inertia=(inert/t_inert) # explained inertia
-  out$csize=round((table(cluID)/sum( table(cluID)))*100,digits=1)
+  out$size=as.integer(aa) #round((table(cluID)/sum( table(cluID)))*100,digits=1)
   out$odata=data.frame(lapply(data.frame(data),factor))
   out$nstart = nstart
   class(out)="clusmca"

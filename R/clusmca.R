@@ -1,17 +1,16 @@
-clusmca <- function(data,nclus,ndim,method="clusCA",alpha=.5,nstart=10,smartStart=NULL,gamma = TRUE,seed=1234){
+clusmca <- function(data,nclus,ndim,method="clusCA",alphak=.5,nstart=100,smartStart=NULL,gamma = TRUE,seed=1234){
 
-#source("clusCA.R")
-#source("iFCB.r")
-#source("MCAk.r")
+  method <- match.arg(method, c("clusCA", "clusca","CLUSCA","CLUSca", "ifcb","iFCB","IFCB","mcak", "MCAk", "MCAK","mcaK"), several.ok = T)[1]
+  method <- tolower(method)
   
-  if(method=="clusCA"){
+  if(method=="clusca"){
     out=clusCA(data=data,nclus=nclus,ndim=ndim,nstart=nstart,smartStart=smartStart, gamma = gamma,seed=seed)
   }
-  if(method=="iFCB"){
+  if(method=="ifcb"){
     out=iFCB(data=data,nclus=nclus,ndim=ndim,nstart=nstart,smartStart=smartStart, gamma = gamma,seed=seed)
   }
-  if(method=="MCAk"){
-    out=MCAk(data=data,nclus=nclus,ndim=ndim,nstart=nstart,alpha = alpha,smartStart=smartStart, seed=seed)
+  if(method=="mcak"){
+    out=MCAk(data=data,nclus=nclus,ndim=ndim,nstart=nstart,alphak = alphak,smartStart=smartStart, gamma = gamma,seed=seed)
   }
   return(out)
   }
