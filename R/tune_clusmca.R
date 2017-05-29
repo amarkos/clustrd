@@ -1,4 +1,4 @@
-tune_clusmca <- function(data, nclusrange = 2:7, ndimrange = 2:4, method = "clusCA", criterion = "asw", dst = "full", alphak = .5, nstart = 100, smartStart = NULL, seed = 1234){
+tune_clusmca <- function(data, nclusrange = 2:5, ndimrange = 2:4, method = "clusCA", criterion = "asw", dst = "full", alphak = .5, nstart = 100, smartStart = NULL, seed = 1234){
   
   criterion <- match.arg(criterion, c("asw", "ASW","ch","CH","crit","CRIT"), several.ok = T)[1]
   criterion <- tolower(criterion)
@@ -8,7 +8,11 @@ tune_clusmca <- function(data, nclusrange = 2:7, ndimrange = 2:4, method = "clus
   
   method <- match.arg(method, c("clusCA", "clusca","CLUSCA","CLUSca", "ifcb","iFCB","IFCB","mcak", "MCAk", "MCAK","mcaK"), several.ok = T)[1]
   method <- tolower(method)
-
+  
+  if (is.null(alphak) == TRUE)
+  { 
+    alphak = 0.5
+  }
   # outclusmca = list()
   critval = matrix(0,max(length(nclusrange)),max(length(ndimrange)))
   
@@ -17,7 +21,6 @@ tune_clusmca <- function(data, nclusrange = 2:7, ndimrange = 2:4, method = "clus
   for (k in nclusrange) {
     for (d in ndimrange) {
       if (k > d) {
-        ##    outclusCA[[k]] <- clusCA(data=data, nclus = k, ndim = d,nstart = nstart,smartStart = smartStart, seed = seed)
         print(paste('Running for',k,'clusters and',d,'dimensions...'))
         outclusmca <- clusmca(data = data, nclus = k, ndim = d,method = method, alphak = alphak, nstart = nstart,smartStart = smartStart, seed = seed)
         
@@ -51,8 +54,6 @@ tune_clusmca <- function(data, nclusrange = 2:7, ndimrange = 2:4, method = "clus
       indk.best <- which(critval == min(critval,na.rm =TRUE), arr.ind = TRUE)[1]
       indd.best <- which(critval == min(critval,na.rm =TRUE), arr.ind = TRUE)[2]
       #FIX: in case of tie returns the lowest (more parsimonious)
-      #  print(indk.best)
-      #print(indd.best) 
     } else {
       indk.best <- which(critval == max(critval,na.rm =TRUE), arr.ind = TRUE)[1]
       indd.best <- which(critval == max(critval,na.rm =TRUE), arr.ind = TRUE)[2]
@@ -75,7 +76,7 @@ tune_clusmca <- function(data, nclusrange = 2:7, ndimrange = 2:4, method = "clus
   
   crit.grid[is.na(crit.grid)]=''
   crit.grid = as.data.frame(crit.grid)
-  out <- list(clusobj = outclusmcabest, nclusbest = k.best, ndimbest = d.best, critbest = crit.best, critgrid  = crit.grid)
-  class(out) = "tune_clusmca"
+  out <- list(clusobjbest = outclusmcabest, nclusbest = k.best, ndimbest = d.best, critbest = crit.best, critgrid  = crit.grid)
+  class(out) = "tuneclus"
   out
 }

@@ -1,7 +1,7 @@
 EmptyKmeans<-function(data,centers){
-  out=list()
-  n=nrow(data)
-  p=ncol(data)
+  out = list()
+  n = nrow(data)
+
   if(length(centers)==1){
     
     K=centers
@@ -29,9 +29,10 @@ EmptyKmeans<-function(data,centers){
       
     }
     
-    
     C=dummy(gvec)
-    G=solve(t(C)%*% C)%*% t(C) %*% data
+    
+    G=chol2inv(chol(t(C)%*% C))%*% t(C) %*% data
+
     CG=C%*%G
     if(length( table(gvec))!=K){
       #print("there is an empty cluster")
@@ -50,7 +51,7 @@ EmptyKmeans<-function(data,centers){
       }
       
       C=dummy(gvec)
-      G=solve(t(C)%*% C)%*% t(C) %*% data
+      G=chol2inv(chol(t(C)%*% C))%*% t(C) %*% data
       CG=C%*%G
     }
     gmat=cbind(gmat,gvec)
@@ -62,9 +63,8 @@ EmptyKmeans<-function(data,centers){
       out$f=f
       break
     }
-    oldf=f
-    centers=G
-    
+    oldf = f
+    centers = G
   }
   
   out

@@ -43,7 +43,7 @@ The dataset was collected with an interactive online version of the Humor Styles
 \item{\code{SD8}}{Letting others laugh at me is my way of keeping my friends and family in good spirits}
   }
 }
-\source{
+\references{
 Martin, R. A., Puhlik-Doris, P., Larsen, G., Gray, J., & Weir, K. (2003). Individual differences in uses of humor and their relation to psychological well-being: Development of the Humor Styles Questionnaire. \emph{Journal of Research in Personality}, \emph{37}(1), 48-75.}
 
 \examples{

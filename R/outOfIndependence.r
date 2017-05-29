@@ -1,6 +1,5 @@
-outOfIndependence=function(data,Gvec,labs,nolabs=F,fixmarg=T,firstfew=0,minx=-2.5,maxx=2.5,segSize=4,textSize=6){
-  #  require(ggplot2)
-  #  require(dummies)
+outOfIndependence=function(data,Gvec,labs,nolabs=FALSE,fixmarg=TRUE,firstfew=0,minx=-2.5,maxx=2.5,segSize=4,textSize=6){
+  
   value = NULL
   newplace = NULL
   lbls = NULL
@@ -10,7 +9,7 @@ outOfIndependence=function(data,Gvec,labs,nolabs=F,fixmarg=T,firstfew=0,minx=-2.
   
   K=max(Gvec)
   C=matrix(0,nrow(data),max(Gvec))
-  # print(dim(C))
+  
   for(j in 1:max(Gvec)){
     C[which(Gvec==j),j]=1
   }
@@ -18,8 +17,6 @@ outOfIndependence=function(data,Gvec,labs,nolabs=F,fixmarg=T,firstfew=0,minx=-2.
   P=t(data) %*% C
   n=nrow(data)
   
-  #   B=t(data) %*% data
-  #   
   P=P/sum(P)
   
   c=apply(P,2,sum)
@@ -58,17 +55,20 @@ outOfIndependence=function(data,Gvec,labs,nolabs=F,fixmarg=T,firstfew=0,minx=-2.
     
     bbp=ggplot(data=dfP[[jj]], aes(x=value,y=newplace),labels=lbls)
     
-    if(fixmarg==T){
+    if(fixmarg==TRUE){
       bbp=bbp+geom_segment(data=dfP[[jj]],aes(x=0,xend=value,y=newplace,yend=newplace),colour=colorPal[jj],size=segSize,alpha=.25)
       bbp=bbp+theme(legend.position="none")+xlab("")+ylab("")+xlim(c(minx,maxx))
       bbp=bbp+theme(axis.text.x  = element_text(size=textSize),axis.text.y  = element_text(size=textSize))
+     # bbp=bbp+xlab(paste("Standardized residuals")) + ylab(paste("Variable categories"))  
       if(firstfew==0){bbp=bbp+theme(axis.line=element_blank(),axis.ticks = element_blank())}
+      
     }
     else{
       
       bbp=bbp+geom_segment(data=dfP[[jj]],aes(x=0,xend=value,y=newplace,yend=newplace),colour=colorPal[jj],size=segSize,alpha=.25)
       bbp=bbp+theme(legend.position="none")+xlab("")+ylab("")+xlim(xran)
       bbp=bbp+theme(axis.text.x  = element_text(size=textSize),axis.text.y  = element_text(size=textSize))
+   #   bbp=bbp+xlab(paste("Standardized residuals")) + ylab(paste("Variable categories"))          
       if(firstfew==0){bbp=bbp+theme(axis.line=element_blank(),axis.ticks = element_blank())}
     }
     if(nolabs==F){

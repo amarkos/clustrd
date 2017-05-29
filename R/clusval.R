@@ -1,16 +1,16 @@
-clusval<-function(x,dst="full"){
+clusval<-function(obj,dst="full"){
   if(dst=="full"){
-    if(class(x)=="cluspca"){
-      data = scale(x$odata, center = x$center, scale = x$scale)
+    if(class(obj)=="cluspca"){
+      data = scale(obj$odata, center = obj$center, scale = obj$scale)
       oDist = daisy(data,metric="euclidean")
     }else{
-      oDist=daisy(x$odata,metric="gower")
+      oDist=daisy(obj$odata,metric="gower")
     }
   }else{
-    oDist=daisy(x$obscoord,metric="euclidean")
+    oDist=daisy(obj$obscoord,metric="euclidean")
   }
   
-  clu_res=cluster.stats(d=oDist,x$cluID,wgap=F,sepindex=F,sepwithnoise=F)
+  clu_res=cluster.stats(d=oDist,obj$cluster,wgap=F,sepindex=F,sepwithnoise=F)
   
   out=list()
   

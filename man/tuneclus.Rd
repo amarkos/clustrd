@@ -1,5 +1,8 @@
 \name{tuneclus}
 \alias{tuneclus}
+\alias{print.tuneclus}
+\alias{summary.tuneclus}
+\alias{fitted.tuneclus}
 
 \title{
 Cluster quality assessment for a range of clusters and dimensions.
@@ -8,10 +11,18 @@ Cluster quality assessment for a range of clusters and dimensions.
 This function facilitates the selection of the appropriate number of clusters and dimensions for joint dimension reduction and clustering methods. 
 }
 \usage{
-tuneclus(data, nclusrange = 2:7, ndimrange = 2:4, method = "RKM",  
+tuneclus(data, nclusrange = 3:4, ndimrange = 2:3, 
+method = c("RKM","FKM","clusCA","iFCB","MCAk"),
 criterion = "asw", dst = "full", alpha = NULL, alphak = NULL, 
 center = TRUE, scale = TRUE, rotation = "none", nstart = 100, 
 smartStart = NULL, seed = 1234)
+
+\method{print}{tuneclus}(x, \dots)
+
+\method{summary}{tuneclus}(object, \dots)
+
+\method{fitted}{tuneclus}(object, mth = c("centers", "classes"), \dots)
+
 }
 
 \arguments{
@@ -21,7 +32,7 @@ smartStart = NULL, seed = 1234)
   \item{method}{Specifies the method. Options are \code{RKM} for reduced K-means, \code{FKM} for factorial K-means, \code{MCAk} for MCA K-means, \code{iFCB} for Iterative Factorial Clustering of Binary variables and \code{clusCA} for Cluster Correspondence Analysis}
   \item{criterion}{One of \code{asw}, \code{ch} or \code{crit}. Determines whether average silhouette width, Calinski-Harabasz index or objective value of the selected method is used (default = \code{"asw")}}
   \item{dst}{Specifies the data used to compute the distances between objects. Options are \code{full} for the original data (after possible scaling) and \code{low} for the object scores in the low-dimensional space (default = \code{"full")}}
-    \item{alpha}{Adjusts for the relative importance of RKM and FKM in the objective function; \code{alpha = 1} reduces to PCA, \code{alpha = 0.5} to reduced K-means, and \code{alpha = 0} to factorial K-means.}
+    \item{alpha}{Adjusts for the relative importance of RKM and FKM in the objective function; \code{alpha = 1} reduces to PCA, \code{alpha = 0.5} to reduced K-means, and \code{alpha = 0} to factorial K-means}
     \item{alphak}{Non-negative scalar to adjust for the relative importance of MCA (\code{alphak = 1}) and K-means (\code{alphak = 0}) in the solution (default = .5). Works only in combination with \code{method = "MCAk"}}
   \item{center}{A logical value indicating whether the variables should be shifted to be zero centered (default = \code{TRUE)}}
   \item{scale}{A logical value indicating whether the variables should be scaled to have unit variance before the analysis takes place (default = \code{TRUE)}}
@@ -30,10 +41,21 @@ for promax rotation (default = \code{"none")}}
   \item{nstart}{Number of starts (default = 100)}
   \item{smartStart}{If \code{NULL} then a random cluster membership vector is generated. Alternatively, a cluster membership vector can be provided as a starting solution}
   \item{seed}{An integer that is used as argument by \code{set.seed()} for offsetting the random number generator when smartStart = NULL. The default value is 1234}
+  \item{x}{For the \code{print} method, a class of \code{clusmca}}
+  \item{object}{For the \code{summary} method, a class of \code{clusmca}}
+  \item{mth}{For the \code{fitted} method, a character string that specifies the type of fitted value to return: \code{"centers"} for the observations center vector, or \code{"class"} for the observations cluster membership value}
+  \item{\dots}{Not used}
 }
 
+\details{
+For the K-means part, the algorithm of Hartigan-Wong is used by default.
+
+The hidden \code{print} and \code{summary} methods print out some key components of an object of class \code{tuneclus}. 
+
+The hidden \code{fitted} method returns cluster fitted values. If method is \code{"classes"}, this is a vector of cluster membership (the cluster component of the "tuneclus" object). If method is \code{"centers"}, this is a matrix where each row is the cluster center for the observation. The rownames of the matrix are the cluster membership values.}
+
 \value{
-\item{clusobj}{The output of the optimal run of \code{cluspca()} or \code{clusmca()}}
+\item{clusobjbest}{The output of the optimal run of \code{cluspca()} or \code{clusmca()}}
 \item{nclusbest}{The optimal number of clusters}
 \item{ndimbest}{The optimal number of dimensions}
 \item{critbest}{The optimal criterion value for \code{nclusbest} clusters and \code{ndimbest} dimensions}
@@ -49,18 +71,16 @@ Kaufman, L., and Rousseeuw, P.J., (1990). \emph{Finding Groups in Data: An Intro
 
 \examples{
 # Reduced K-means for a range of clusters and dimensions
-# Cluster quality assessment based on the average silhouette width 
-# in the low dimensional space
 data(macro)
-bestRKM = tuneclus(macro, 3:4, 2:3, method = "RKM", criterion = "asw", dst = "low",nstart = 10)
+# Cluster quality assessment based on the average silhouette width # in the low dimensional space
+bestRKM = tuneclus(macro, 3:4, 2:3, method = "RKM", criterion = "asw", dst = "low", nstart = 10)
 bestRKM
-#plot(bestRKM$clusobj)
+plot(bestRKM)
 
 # Cluster Correspondence Analysis for a range of clusters and dimensions
-# Cluster quality assessment based on the average silhouette width 
-# in the full dimensional space
 data(underwear)
+# Cluster quality assessment based on the average silhouette width # in the full dimensional space
 bestclusCA = tuneclus(underwear, 3:4, 2:3, method = "clusCA", criterion = "asw", nstart = 10)
 bestclusCA
-#plot(bestclusCA$clusobj)
+plot(bestclusCA)
 }

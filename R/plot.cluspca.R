@@ -1,4 +1,4 @@
-plot.cluspca<-function(x, dims = c(1,2), cludesc = FALSE, what = c(TRUE,TRUE), ...){
+plot.cluspca<-function(x, dims = c(1,2), cludesc = FALSE, what = c(TRUE,TRUE), attlabs, ...){
   
   d1 = NULL
   d2 = NULL
@@ -8,14 +8,19 @@ plot.cluspca<-function(x, dims = c(1,2), cludesc = FALSE, what = c(TRUE,TRUE), .
   attnam = NULL
   slp = NULL
   
-  out=list()
+  if (dim(data.frame(x$attcoord))[2] == 1) {
+    stop('There is only one dimension. A 2D scatterplot cannot be produced.')
+  } 
+  # out=list()
   dim1=dims[1]
   dim2=dims[2]
-  K=max(x$cluID)
+  K=max(x$cluster)
   
-  attlabs=row.names(x$attcoord)
+  if (missing(attlabs)) {
+    attlabs=colnames(x$odata) #row.names(x$attcoord)
+  }
   #do not show obs labels if more than 30
-  if (dim(x$odata)[1] < 30) {
+  if (dim(x$obscoord)[1] < 30) {
     obslabs = row.names(x$odata)
   } else
   {
@@ -53,12 +58,13 @@ plot.cluspca<-function(x, dims = c(1,2), cludesc = FALSE, what = c(TRUE,TRUE), .
   xattmax=xattmin+att_range
   yattmax=yattmin+att_range
   ######################################################
-  
   att_df=data.frame(d1=x$attcoord[,dim1],d2=x$attcoord[,dim2],attnam=attlabs)
   glab=paste(rep("C",K),1:K,sep="")  
-  group_df= data.frame(d1=x$centroid[,dim1],d2=x$centroid[,dim2],glab=glab,gr=levels(factor(x$cluID)))
-  
-  obs_df=data.frame(d1=x$obscoord[,dim1],d2=x$obscoord[,dim2],gr=factor(x$cluID),olab=obslabs)
+  if (length(x$size) != 1)
+  {
+    group_df= data.frame(d1=x$centroid[,dim1],d2=x$centroid[,dim2],glab=glab,gr=levels(factor(x$cluster)))
+  }
+  obs_df=data.frame(d1=x$obscoord[,dim1],d2=x$obscoord[,dim2],gr=factor(x$cluster),olab=obslabs)
   
   xact=union(which(att_df$d1> .5),which(att_df$d1< -.5))
   yact=union(which(att_df$d2>.5), which(att_df$d2< -.5))
@@ -70,18 +76,23 @@ plot.cluspca<-function(x, dims = c(1,2), cludesc = FALSE, what = c(TRUE,TRUE), .
     a=ggplot(data=obs_df,aes(x=d1,y=d2))+xlim(xallmin,xallmax)+ylim(yallmin,yallmax)
     a=a+geom_point(aes(x=d1,y=d2,colour=gr,shape=gr,alpha=.4),size=1)+theme_bw()
     #do not show obs labels if more than 30
-    if (dim(x$odata)[1] < 30) {
+    if (dim(x$obscoord)[1] < 30) {
       a=a+geom_text_repel(data=obs_df,aes(label=olab))
     }
     a=a+theme(legend.position="none",axis.text.x = element_blank(),axis.text.y = element_blank())+xlab("")+ylab("")
-    a=a+geom_point(data=group_df,aes(x=d1,y=d2,shape=gr))+theme(legend.position="none",axis.text.x = element_blank(),axis.text.y = element_blank())
-    a=a+geom_text_repel(data=group_df,aes(label=glab))
+    if (length(x$size) != 1)
+    {
+      a=a+geom_point(data=group_df,aes(x=d1,y=d2,shape=gr))+theme(legend.position="none",axis.text.x = element_blank(),axis.text.y = element_blank())
+      a=a+geom_text_repel(data=group_df,aes(label=glab))
+    }
     a=a+geom_vline(xintercept=0)+geom_hline(yintercept=0)
+    a=a+xlab(paste("Dim.",dims[1])) + ylab(paste("Dim.",dims[2]))  
     
     # if(disp==F){ggsave(filename = paste("K",deparse(K),"Map_units.pdf",sep=""),a,height=8 , width=8)
     #  }else{
-    out$map=a
-  #  print(a)
+    out = a
+    #out$map=a
+    #  print(a)
     #  }
     
   }
@@ -107,18 +118,20 @@ plot.cluspca<-function(x, dims = c(1,2), cludesc = FALSE, what = c(TRUE,TRUE), .
     a=ggplot(data=att_df,aes(x=d1,y=d2))+xlim(xallmin,xallmax)+ylim(yallmin,yallmax)
     a=a+geom_point(alpha=.5,size=.25)+theme_bw()+xlab("")+ylab("")
     a=a+geom_text_repel(data=subset(att_df,act=="outer"),aes( label = attnam),size=mysize,segment.size = 0.1)
-    a=a+geom_text(data=subset(att_df,act!="outer"),aes( label = attnam),size=mysize*.8)
+    a=a+geom_text(data=subset(att_df,act!="outer"),aes( label = attnam),size=mysize) #size=mysize*.8)
     a=a+geom_segment(data=att_df, aes(x=0,y=0,xend=d1,yend=d2),arrow=arrow(angle=15,unit(0.15, "inches")))
     a=a+annotate("path",x=0+1*cos(seq(0,2*pi,length.out=100)),
                  y=0+1*sin(seq(0,2*pi,length.out=100)))
     # a=a+geom_point(data=group_df,aes(x=d1,y=d2,shape=gr))+theme(legend.position="none",axis.text.x = element_blank(),axis.text.y = element_blank())
     # a=a+geom_text_repel(data=group_df,aes(label=glab))
     a=a+geom_vline(xintercept=0)+geom_hline(yintercept=0)
+    a=a+xlab(paste("Dim.",dims[1])) + ylab(paste("Dim.",dims[2]))  
     #  if(disp==F){
     #    ggsave(filename = paste("K",deparse(K),"Map_attributes.pdf",sep=""),a,height=8 , width=8)
     #  }else{
-    out$map=a
-  #  print(a)
+    out = a
+    #out$map=a
+    #  print(a)
     #  }
   }
   if(what[1]==TRUE && what[2]==TRUE ){
@@ -129,16 +142,19 @@ plot.cluspca<-function(x, dims = c(1,2), cludesc = FALSE, what = c(TRUE,TRUE), .
       mysize=max(2,mysize)
     }else{mysize=5}
     
-    
     a=ggplot(data=obs_df,aes(x=d1,y=d2))+xlim(xallmin,xallmax)+ylim(yallmin,yallmax)
     a=a+geom_point(aes(x=d1,y=d2,shape=gr,alpha=.4),size=1)+theme_bw()#,colour=gr
     #do not show obs labels if more than 30
-    if (dim(x$odata)[1] < 30) {
+    if (dim(x$obscoord)[1] < 30) {
       a=a+geom_text_repel(data=obs_df,aes(label=olab))
     }
+    
     a=a+theme(axis.text.x = element_blank(),axis.text.y = element_blank())+xlab("")+ylab("")
-    a=a+geom_point(data=group_df,aes(x=d1,y=d2,shape=gr))
-    a=a+geom_text_repel(data=group_df,aes(label=glab))
+    if (length(x$size) != 1)
+    {
+      a=a+geom_point(data=group_df,aes(x=d1,y=d2,shape=gr))
+      a=a+geom_text_repel(data=group_df,aes(label=glab))
+    }
     a=a+geom_vline(xintercept=0)+geom_hline(yintercept=0)
     att_df$slp=att_df$d2/att_df$d1
     
@@ -151,13 +167,11 @@ plot.cluspca<-function(x, dims = c(1,2), cludesc = FALSE, what = c(TRUE,TRUE), .
       neg_val=which(quad_check[j]<0)
       marg_df[neg_val,j]=marg_mat[j,1]
       marg_df[-neg_val,j]=marg_mat[j,2]
-      
     }
     
     who_marg=apply(marg_df,1,function(x)which.min(abs(x)))
     
     arrow_df=marg_df
-    xy=c("x","y")
     for(i in 1:length(who_marg)){
       arrow_df$rd2[i]=arrow_df$d1[i]*(att_df$slp[i])
       arrow_df$rd1[i]=arrow_df$d2[i]*(1/att_df$slp[i])
@@ -183,17 +197,24 @@ plot.cluspca<-function(x, dims = c(1,2), cludesc = FALSE, what = c(TRUE,TRUE), .
                      arrow=arrow(length=unit(.15,"inches")))
     
     a=a+theme(legend.title=element_blank(),legend.position="none",axis.text.x = element_blank(),axis.text.y = element_blank())
-    a=a+guides(shape=FALSE,alpha=FALSE)
+    a=a+guides(shape=FALSE, alpha=FALSE)
     
-    a=a+geom_text_repel(data=myarrow_df,aes(x=d1,y=d2,label=attnam))
+    #do not show var labels if more than 50
+    if (dim(x$attcoord)[1] < 50) {
+      a=a+geom_text_repel(data=myarrow_df,aes(x=d1,y=d2,label=attnam))
+    }
     
-    out$map=a
-  #  print(a)
+    a=a+xlab(paste("Dim.",dims[1])) + ylab(paste("Dim.",dims[2]))  
+    
+    out = a
+    
   }
   
   if(cludesc==TRUE){
-    cdsc = clu_means(x$odata,x$cluID, center=x$center,scale=x$scale)
+    cdsc = clu_means(x$odata, x$cluster, center=x$center, scale=x$scale)
+    out=list()
+    out$map = a
     out$parcoord = cdsc
-    }
+  }
   out 
 }

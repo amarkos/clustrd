@@ -1,5 +1,9 @@
 \name{clusmca}
 \alias{clusmca}
+\alias{print.clusmca}
+\alias{summary.clusmca}
+\alias{fitted.clusmca}
+
 \title{
 Joint  dimension  reduction  and  clustering  of  categorical  data.
 }
@@ -9,13 +13,20 @@ This function implements MCA K-means (Hwang, Dillon and Takane, 2006), i-FCB (Io
 }
 
 \usage{
-clusmca(data, nclus, ndim, method = "clusCA", alphak = .5,
-nstart = 100, smartStart = NULL, gamma = TRUE, seed = 1234)
+clusmca(data, nclus, ndim, method=c("clusCA","iFCB","MCAk"),
+alphak = .5, nstart = 100, smartStart = NULL, gamma = TRUE, 
+seed = 1234)
+
+\method{print}{clusmca}(x, \dots)
+
+\method{summary}{clusmca}(object, \dots)
+
+\method{fitted}{clusmca}(object, mth = c("centers", "classes"), \dots)
 }
 
 \arguments{
-  \item{data}{Categorical dataset}
-  \item{nclus}{Number of clusters}
+  \item{data}{Dataset with categorical variables}
+  \item{nclus}{Number of clusters (nclus = 1 returns the MCA solution; see Details)}
   \item{ndim}{Dimensionality of the solution}
   \item{method}{Specifies the method. Options are MCAk for MCA K-means, iFCB for Iterative Factorial Clustering of Binary variables and clusCA for Cluster Correspondence Analysis (default = \code{"clusCA")}}
   \item{alphak}{Non-negative scalar to adjust for the relative importance of MCA (\code{alphak = 1}) and K-means (\code{alphak = 0}) in the solution (default = .5). Works only in combination with \code{method = "MCAk"}}
@@ -23,13 +34,27 @@ nstart = 100, smartStart = NULL, gamma = TRUE, seed = 1234)
   \item{smartStart}{If \code{NULL} then a random cluster membership vector is generated. Alternatively, a cluster membership vector can be provided as a starting solution}
   \item{gamma}{Scaling parameter that leads to similar spread in the object and variable scores (default = \code{TRUE})}
   \item{seed}{An integer that is used as argument by \code{set.seed()} for offsetting the random number generator when \code{smartStart = NULL}. The default value is 1234}
+  \item{x}{For the \code{print} method, a class of \code{clusmca}}
+  \item{object}{For the \code{summary} method, a class of \code{clusmca}}
+  \item{mth}{For the \code{fitted} method, a character string that specifies the type of fitted value to return: \code{"centers"} for the observations center vector, or \code{"class"} for the observations cluster membership value}
+  \item{\dots}{Not used}
+}
+
+\details{
+For the K-means part, the algorithm of Hartigan-Wong is used by default.
+
+The hidden \code{print} and \code{summary} methods print out some key components of an object of class \code{clusmca}. 
+
+The hidden \code{fitted} method returns cluster fitted values. If method is \code{"classes"}, this is a vector of cluster membership (the cluster component of the "clusmca" object). If method is \code{"centers"}, this is a matrix where each row is the cluster center for the observation. The rownames of the matrix are the cluster membership values.
+
+When \code{nclus} = 1 the function returns the MCA solution with objects in principal and variables in standard coordinates (\code{plot(object)} shows the corresponding asymmetric biplot).
 }
 
 \value{
 \item{obscoord}{Object scores}
 \item{attcoord}{Variable scores}
 \item{centroid}{Cluster centroids}
-\item{cluID}{Cluster membership}
+\item{cluster}{Cluster membership}
 \item{criterion}{Optimal value of the objective criterion}
 \item{size}{The number of objects in each cluster}
 \item{nstart}{A copy of \code{nstart} in the return object}
@@ -44,7 +69,7 @@ van de Velden M., Iodice D' Enza, A., and Palumbo, F. (2017).  Cluster correspon
 }
 
 \seealso{
-\code{\link{cluspca}}, \code{\link{clusval}}, \code{\link{tuneclus}}
+\code{\link{cluspca}}, \code{\link{tuneclus}}
 }
 \examples{
 data(cmc)
@@ -55,7 +80,8 @@ levels(cmc$W_AGE) = c("16-26","27-39","40-49")
 cmc$NCHILD = ordered(cut(cmc$NCHILD, c(0,1,4,17), right = FALSE))
 levels(cmc$NCHILD) = c("0","1-4","5 and above")
 
-#Cluster Correspondence Analysis solution with 3 clusters in 2 dimensions after #10 random starts
+#Cluster Correspondence Analysis solution with 3 clusters in 2 dimensions 
+#after 10 random starts
 outclusCA = clusmca(cmc, 3, 2, method = "clusCA", nstart = 10)
 outclusCA
 #Scatterplot (dimensions 1 and 2)
@@ -66,4 +92,11 @@ outMCAk = clusmca(cmc, 3, 2, method = "MCAk", nstart = 10)
 outMCAk
 #Scatterplot (dimensions 1 and 2)
 plot(outMCAk)
+
+#nclus = 1 just gives the MCA solution
+#outMCA = clusmca(cmc, 1, 2)
+#outMCA
+#Scatterplot (dimensions 1 and 2) 
+#asymmetric biplot with scaling gamma = TRUE
+#plot(outMCA)
 }

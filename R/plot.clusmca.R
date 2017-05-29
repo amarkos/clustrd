@@ -1,15 +1,18 @@
 plot.clusmca<-function(x, dims = c(1,2), what = c(TRUE,TRUE), cludesc = FALSE, topstdres = 20, attlabs = NULL, binary = FALSE, subplot = FALSE, ...){
-  
-  out = list()
+
   act = NULL
   attnam = NULL
   d1 = NULL
   d2 = NULL
   gr = NULL
   
+  if (dim(data.frame(x$attcoord))[2] == 1) {
+    stop('There is only one dimension. A 2D scatterplot cannot be produced.')
+  } 
+  
   dim1=dims[1]
   dim2=dims[2]
-  K = max(x$cluID)
+  K = max(x$cluster)
   
   dfAtt=data.frame(x1=x$attcoord[,1],x2=x$attcoord[,2])
   
@@ -59,22 +62,32 @@ plot.clusmca<-function(x, dims = c(1,2), what = c(TRUE,TRUE), cludesc = FALSE, t
   att_df$act[xyact]="outer"
   
   glab=paste(rep("C",K),1:K,sep="")
-  group_df= data.frame(d1=x$centroid[,dim1],d2=x$centroid[,dim2],glab=glab)
-  obs_df=data.frame(d1=x$obscoord[,dim1],d2=x$obscoord[,dim2],gr=factor(x$cluID))
+  if (length(x$size) != 1)
+  {
+    group_df= data.frame(d1=x$centroid[,dim1],d2=x$centroid[,dim2],glab=glab)
+  }
+  obs_df=data.frame(d1=x$obscoord[,dim1],d2=x$obscoord[,dim2],gr=factor(x$cluster))
   
   if(what[1]==TRUE && what[2]==FALSE ){
-    names(group_df)[3] = "gr"
-    levels(obs_df$gr) = levels(group_df$gr)
-    
+    if (length(x$size) != 1)
+    {
+      names(group_df)[3] = "gr"
+      levels(obs_df$gr) = levels(group_df$gr)
+    }
     a=ggplot(data=obs_df,aes(x=d1,y=d2,colour=gr,shape=gr))+xlim(xallmin,xallmax)+ylim(yallmin,yallmax)
     a=a+geom_point(aes(x=d1,y=d2,colour=gr,shape=gr,alpha=.4),size=1,na.rm = TRUE)+theme_bw()
     a=a+theme(legend.position="none",axis.text.x = element_blank(),axis.text.y = element_blank())+xlab("")+ylab("")
     a=a+geom_vline(xintercept=0)+geom_hline(yintercept=0)
     
-    a=a+geom_point(data=group_df,colour="black",aes(x=d1,y=d2,shape=gr),na.rm=TRUE)+theme(legend.position="none",axis.text.x = element_blank(),axis.text.y = element_blank())
-    a=a+geom_text_repel(data=group_df,colour="black",aes(label=gr))
-    
-    out$map_units=a
+    if (length(x$size) != 1)
+    {
+      a=a+geom_point(data=group_df,colour="black",aes(x=d1,y=d2,shape=gr),na.rm=TRUE)+theme(legend.position="none",axis.text.x = element_blank(),axis.text.y = element_blank())
+      
+      a=a+geom_text_repel(data=group_df,colour="black",aes(label=gr))
+    }
+    a=a+xlab(paste("Dim.",dims[1])) + ylab(paste("Dim.",dims[2]))  
+    out = a
+    #out$map=a
     #    print(a)
     
   }
@@ -95,17 +108,24 @@ plot.clusmca<-function(x, dims = c(1,2), what = c(TRUE,TRUE), cludesc = FALSE, t
     a=a+geom_point(alpha=.5,size=.25,na.rm = TRUE)+theme_bw()+xlab("")+ylab("")
     a=a+geom_text_repel(data=subset(att_df,act=="outer"),aes( label = attnam),size=mysize,segment.size = 0.01)
     a=a+geom_text_repel(data=subset(att_df,act!="outer"),aes( label = attnam),size=mysize*.8,segment.size = 0.01)
-    a=a+geom_point(data=group_df,aes(x=d1,y=d2,shape=glab),na.rm=TRUE)+theme(legend.position="none",axis.text.x = element_blank(),axis.text.y = element_blank())
-    a=a+geom_text_repel(data=group_df,aes(label=glab))
+    if (length(x$size) != 1)
+    {  
+      a=a+geom_point(data=group_df,aes(x=d1,y=d2,shape=glab),na.rm=TRUE)+theme(legend.position="none",axis.text.x = element_blank(),axis.text.y = element_blank())
+      a=a+geom_text_repel(data=group_df,aes(label=glab))
+    }
     a=a+geom_vline(xintercept=0)+geom_hline(yintercept=0)
-    
-    out$map_attrs=a
+    a=a+xlab(paste("Dim.",dims[1])) + ylab(paste("Dim.",dims[2]))  
+    out = a
+    #out$map=a
     #    print(a)
   }
   if(what[1]==TRUE && what[2]==TRUE ){
     
-    names(group_df)[3] = "gr"
-    levels(obs_df$gr) = levels(group_df$gr)
+    if (length(x$size) != 1)
+    {
+      names(group_df)[3] = "gr"
+      levels(obs_df$gr) = levels(group_df$gr)
+    }
     
     if(nrow(att_df)>=25){
       decr=(nrow(att_df)-25)*(1/250)
@@ -118,21 +138,24 @@ plot.clusmca<-function(x, dims = c(1,2), what = c(TRUE,TRUE), cludesc = FALSE, t
     a=a+geom_point(data=obs_df,aes(x=d1,y=d2,colour=gr,shape=gr,alpha=.4),size=1,na.rm = TRUE)+theme_bw()
     a=a+theme(legend.position="none",axis.text.x = element_blank(),axis.text.y = element_blank())+xlab("")+ylab("")
     a=a+geom_vline(xintercept=0)+geom_hline(yintercept=0)
-    a=a+geom_point(data=group_df,colour="black",aes(x=d1,y=d2,shape=gr),na.rm = TRUE)+theme(legend.position="none",axis.text.x = element_blank(),axis.text.y = element_blank())
-    a=a+geom_text_repel(data=group_df,colour="black",aes(label=gr))
-    
+    if (length(x$size) != 1)
+    {
+      a=a+geom_point(data=group_df,colour="black",aes(x=d1,y=d2,shape=gr),na.rm = TRUE)+theme(legend.position="none",axis.text.x = element_blank(),axis.text.y = element_blank())
+      a=a+geom_text_repel(data=group_df,colour="black",aes(label=gr))
+    }
     # 
     a = a + geom_point(data=att_df,aes(x=d1,y=d2),alpha=.5,size=.25,na.rm=TRUE) #+theme_bw()+xlab("")+ylab("")
     a=a+geom_text_repel(data=subset(att_df,act=="outer"),aes( label = attnam),size=mysize,segment.size = 0.1)
     a=a+geom_text_repel(data=subset(att_df,act!="outer"),aes( label = attnam),size=mysize*.8,segment.size = 0.01)
     a=a+geom_vline(xintercept=0)+geom_hline(yintercept=0)
-    
-    out$map=a
+    a=a+xlab(paste("Dim.",dims[1])) + ylab(paste("Dim.",dims[2]))  
+    out = a
+    #    out$map=a
     #    print(a)
   }
   
   if(cludesc==TRUE){
-    csize = round((table(x$cluID)/sum(table(x$cluID)))*100,digits=1)
+    csize = round((table(x$cluster)/sum(table(x$cluster)))*100,digits=1)
     cnames=paste("C",1:K,sep="")
     cnm=paste(cnames,": ",csize,"%",sep="")
     
@@ -143,9 +166,9 @@ plot.clusmca<-function(x, dims = c(1,2), what = c(TRUE,TRUE), cludesc = FALSE, t
     
     myminx = -10
     mymaxx = 10
-    TopplotGroups=outOfIndependence(x$odata,x$cluID,attlabs,firstfew=ffew,textSize=4,segSize=4,minx=myminx,maxx=mymaxx)
+    TopplotGroups=outOfIndependence(x$odata,x$cluster,attlabs,firstfew=ffew,textSize=4,segSize=4,minx=myminx,maxx=mymaxx)
     
-    plotGroups=outOfIndependence(x$odata,x$cluID,nolabs=T,attlabs,fixmarg=F,textSize=1.5,segSize=1.5,minx=-2.5,maxx=2.5)
+    plotGroups=outOfIndependence(x$odata,x$cluster,nolabs=T,attlabs,fixmarg=F,textSize=1.5,segSize=1.5,minx=-2.5,maxx=2.5)
     
     for(jjj in 1:K){
       TopplotGroups$G[[jjj]]=TopplotGroups$G[[jjj]]+theme_bw()+ggtitle(cnm[jjj])
@@ -157,6 +180,8 @@ plot.clusmca<-function(x, dims = c(1,2), what = c(TRUE,TRUE), cludesc = FALSE, t
       # print(TopplotGroups$G[[jjj]])
     }
     if (subplot == FALSE) {
+      out = list()
+      out$map = a
       out$stdres = TopplotGroups$G
     }
     #}
@@ -164,3 +189,4 @@ plot.clusmca<-function(x, dims = c(1,2), what = c(TRUE,TRUE), cludesc = FALSE, t
   out
   
 }
+#}

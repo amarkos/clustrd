@@ -1,12 +1,12 @@
 iFCB<- function(data,nclus=3,ndim=2,nstart=100,smartStart=NULL,gamma = TRUE,seed=1234){
-
+  
   minobs = min(sapply(apply(data,2,unique),length))
   maxobs = max(sapply(apply(data,2,unique),length))
-  
+  data=data.frame(data)
   q=ncol(data)
   n=nrow(data)
   
-  dZ = as.matrix(dummy.data.frame(data,dummy.classes = "ALL"))
+  dZ = as.matrix(dummy.data.frame(data, dummy.classes = "ALL")) #as.matrix(dummy.data.frame(data,dummy.classes = "ALL"))
   ndZ = ncol(dZ)
   
   best_f=1000000
@@ -37,7 +37,6 @@ iFCB<- function(data,nclus=3,ndim=2,nstart=100,smartStart=NULL,gamma = TRUE,seed
     while((it<=itmax)&&(imp>ceps)){
       
       it=it+1 
-      
       Fmat = t(C) %*% dZ #crossprod(C,dZ) #
       P=Fmat/sum(Fmat)
       r= rowSums(P)
@@ -67,12 +66,11 @@ iFCB<- function(data,nclus=3,ndim=2,nstart=100,smartStart=NULL,gamma = TRUE,seed
       
       outK=try(kmeans(Y,centers=G,nstart=100),silent=T)
       if(is.list(outK)==F){
-        #print("singleton")
         outK=EmptyKmeans(Y,centers=G)  
-        #  break
+        #break
       }
       
-      G=outK$centers
+      G = outK$centers
       ngvec = outK$cluster
       C = dummy(ngvec)
       centerC = matrix(apply(C,2,sum),nrow=n,ncol=nclus,byrow=T)/n
@@ -86,7 +84,6 @@ iFCB<- function(data,nclus=3,ndim=2,nstart=100,smartStart=NULL,gamma = TRUE,seed
       imp=f0-f
       fvec=c(fvec,f)
       f0=f
-      #lambda=nsv
     }
     
     if(f<=best_f){
@@ -148,13 +145,13 @@ iFCB<- function(data,nclus=3,ndim=2,nstart=100,smartStart=NULL,gamma = TRUE,seed
   #  final_loss=sum(diag(t(MzDzi_GB)%*%MzDzi_GB))
   #################################  
   
-  cluID = ngvec
+  cluster = ngvec
   #library(plyr)
   ##reorder cluster membership according to cluster size
-  size = table(cluID) #round((table(cluID)/sum( table(cluID)))*100,digits=2)
+  size = table(cluster) #round((table(cluster)/sum( table(cluster)))*100,digits=2)
   aa = sort(size,decreasing = TRUE)
   #aa = sort(csize,decreasing = TRUE)
-  cluID = mapvalues(cluID, from = as.integer(names(aa)), to = as.integer(names(table(cluID))))
+  cluster = mapvalues(cluster, from = as.integer(names(aa)), to = as.integer(names(table(cluster))))
   #reorder centroids
   G = G[as.integer(names(aa)),]
   
@@ -162,16 +159,16 @@ iFCB<- function(data,nclus=3,ndim=2,nstart=100,smartStart=NULL,gamma = TRUE,seed
   out$obscoord=Y
   out$attcoord=B
   out$centroid=G
-  cluID = as.integer(cluID)
-  names(cluID) = rownames(data) 
-  out$cluID=cluID
+  cluster = as.integer(cluster)
+  names(cluster) = rownames(data) 
+  out$cluster=cluster
   #  out$final_loss=final_loss
   out$criterion=f
   #  out$iters=it
   #  out$expl_inertia= (inert/t_inert)
   #  out$lambda=lambda
   # out$critvec=fvec
-  out$size=as.integer(aa) #round((table(cluID)/sum( table(cluID)))*100,digits=1)
+  out$size=as.integer(aa) #round((table(cluster)/sum( table(cluster)))*100,digits=1)
   out$odata=data.frame(lapply(data.frame(data),factor))
   out$nstart = nstart
   class(out)="clusmca"

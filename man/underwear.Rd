@@ -9,10 +9,10 @@ The dataset comes from a large survey conducted by a South Korean underwear manu
 \format{
   A data frame with 664 observations on the following variables.
   \describe{
-    \item{\code{brand}}{categorical: \code{1. BYC}, \code{2. TRY}, \code{3. VICMAN}, \code{4. James Dean}, \code{5. Michiko-London}, \code{6. Benetton}, \code{7. Bodyguard}, \code{8. Calvin Klein}}
-    \item{\code{atts}}{categorical: \code{1. Comfortable}, \code{2. Smooth}, \code{3. Superior fabrics}, \code{4. Reasonable price}, \code{5. Fashionable design}, \code{6. Favorable advertisements}, \code{7. Trendy color}, \code{8. Good design}, \code{9. Various colors}, \code{10. Elastic}, \code{11. Store is near}, \code{12. Excellent fit}, \code{13. Design quality}, \code{14. Youth appeal},
-\code{15. Various sizes}}
-    \item{\code{age}}{categorical: \code{1. 10-29}, \code{2. 30-49}, \code{3. 50 and over}}
+    \item{\code{brand}}{factor indicating underwear brand, with levels \code{1. BYC}, \code{2. TRY}, \code{3. VICMAN}, \code{4. James Dean}, \code{5. Michiko-London}, \code{6. Benetton}, \code{7. Bodyguard}, \code{8. Calvin Klein}.}
+    \item{\code{atts}}{factor indicating underwear attributes, with levels \code{1. Comfortable}, \code{2. Smooth}, \code{3. Superior fabrics}, \code{4. Reasonable price}, \code{5. Fashionable design}, \code{6. Favorable advertisements}, \code{7. Trendy color}, \code{8. Good design}, \code{9. Various colors}, \code{10. Elastic}, \code{11. Store is near}, \code{12. Excellent fit}, \code{13. Design quality}, \code{14. Youth appeal},
+\code{15. Various sizes}.}
+    \item{\code{age}}{ordered factor indicating consumer's age, with levels \code{1. 10-29}, \code{2. 30-49}, \code{3. 50 and over}.}
   }
 }
 
