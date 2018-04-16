@@ -6,7 +6,7 @@ outOfIndependence=function(data,Gvec,labs,nolabs=FALSE,fixmarg=TRUE,firstfew=0,m
   
   data=data.frame(data)
   data=dummy.data.frame(data, dummy.classes = "ALL")
-  
+  #data = data.matrix(data)
   K=max(Gvec)
   C=matrix(0,nrow(data),max(Gvec))
   
@@ -36,7 +36,6 @@ outOfIndependence=function(data,Gvec,labs,nolabs=FALSE,fixmarg=TRUE,firstfew=0,m
   bp=list()
   
   colorPal=rainbow(K)
-  
   for(jj in 1:K){
     #topfew=which(abs(devP[,jj]*sqrt(n))>1)
     #print(labs[topfew])

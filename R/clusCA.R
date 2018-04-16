@@ -67,7 +67,7 @@ clusCA <- function(data,nclus,ndim,nstart=100,smartStart=NULL,gamma = FALSE, see
       #empty clusters
       if(is.list(outK) == F){
         outK=EmptyKmeans(Yi,centers=Gi) 
-        break 
+      #  break 
       }
       Zki=outK$cluster
       Gi=outK$centers
@@ -99,9 +99,6 @@ clusCA <- function(data,nclus,ndim,nstart=100,smartStart=NULL,gamma = FALSE, see
       
       # B rescaled in such a way that B'DzB=nqI.
       improv=sum(diag(t(Gi)%*% t(Zki)%*%Zki%*%Gi))-objbef
-      if (improv < -0.000001){
-        break
-      }
       objbef=sum(diag(t(Gi) %*% t(Zki) %*% Zki %*% Gi))
       
       #varsi=sum(diag(t(Gi)%*% Dk %*% Gi)) #no need to calc inside the loop
@@ -158,4 +155,3 @@ clusCA <- function(data,nclus,ndim,nstart=100,smartStart=NULL,gamma = FALSE, see
   class(out)="clusmca"
   return(out)
 }
-

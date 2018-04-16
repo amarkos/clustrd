@@ -35,7 +35,7 @@ rosplit <- function(data,U0)
       p = which.min(distt[,i])
       U[i,p] = 1
     }
-    su = apply(U,2,sum)
+  #  su = apply(U,2,sum)
     # given U compute Xmean (compute centroids)
     Xmean = pseudoinverse(U)%*%data
     
@@ -47,9 +47,7 @@ rosplit <- function(data,U0)
       Xmean0=Xmean
       U0=U
       so=sa
-    } else {
-      break
-    }
+    } 
   }
   out$U = U
   out

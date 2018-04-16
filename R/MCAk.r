@@ -23,7 +23,7 @@ MCAk <- function(data, nclus = 3, ndim = 2, alphak = .5, nstart = 100, smartStar
     
     if(is.list(outK) == FALSE){
       outK = EmptyKmeans(Fm,centers=center)  
-      break
+     # break
     }
     
     index = outK$cluster

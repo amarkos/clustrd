@@ -1,5 +1,5 @@
 clusmca <- function(data,nclus,ndim,method=c("clusCA","iFCB","MCAk"),alphak = .5,nstart=100,smartStart=NULL,gamma = TRUE,seed=1234){
-  
+
   #### A single cluster gives the MCA solution
   if (nclus == 1) { 
     nstart = 1
@@ -15,7 +15,6 @@ clusmca <- function(data,nclus,ndim,method=c("clusCA","iFCB","MCAk"),alphak = .5
       A = (1/g)*A
       Fm = g*Fm
     }
-    
     out=list()
     out$obscoord=Fm # observations coordinates 
     out$attcoord=A # attributes coordinates 

@@ -78,9 +78,9 @@ bestRKM
 plot(bestRKM)
 
 # Cluster Correspondence Analysis for a range of clusters and dimensions
-data(underwear)
+data(hsq)
 # Cluster quality assessment based on the average silhouette width # in the full dimensional space
-bestclusCA = tuneclus(underwear, 3:4, 2:3, method = "clusCA", criterion = "asw", nstart = 10)
+bestclusCA = tuneclus(hsq[,1:4], 3:4, 2:3, method = "clusCA", criterion = "asw", nstart = 10)
 bestclusCA
 plot(bestclusCA)
 }

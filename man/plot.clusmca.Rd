@@ -38,13 +38,13 @@ van de Velden M., Iodice D'Enza, A., and Palumbo, F. (2017).  Cluster correspond
 \link{plot.cluspca}
 }
 \examples{
-data("underwear")
+data("hsq")
 #Cluster Correspondence Analysis with 3 clusters in 2 dimensions after 10 random starts
-outclusMCA = clusmca(underwear, 3, 2, nstart = 10)
+outclusMCA = clusmca(hsq[,1:8], 3, 2, nstart = 10)
 #Save the ggplot2 scatterplot  
 map = plot(outclusMCA)
 #Customization (adding titles)
-map + ggtitle(paste("Cluster CA plot of the underwear data: 3 clusters of sizes ", 
+map + ggtitle(paste("Cluster CA plot of the hsq data: 3 clusters of sizes ", 
 paste(outclusMCA$size, collapse = ", "),sep = "")) + 
 xlab("Dim. 1") + ylab("Dim. 2") + 
 theme(plot.title = element_text(size = 10, face = "bold", hjust = 0.5))

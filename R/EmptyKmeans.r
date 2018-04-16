@@ -55,13 +55,14 @@ EmptyKmeans<-function(data,centers){
       CG=C%*%G
     }
     gmat=cbind(gmat,gvec)
-    f= sum(diag(t(data-CG) %*% (data-CG)))
+    f = sum(diag(t(data-CG) %*% (data-CG)))
+    f = as.numeric(f) #fixes complex value 16-04-2018
     #print(f)
     if((oldf-f) <= 0){
       out$cluster=gvec
       out$centers=G
       out$f=f
-      break
+      it = maxiter + 1
     }
     oldf = f
     centers = G
