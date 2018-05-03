@@ -1,11 +1,11 @@
 plot.clusmca<-function(x, dims = c(1,2), what = c(TRUE,TRUE), cludesc = FALSE, topstdres = 20, attlabs = NULL, binary = FALSE, subplot = FALSE, ...){
-
+  
   act = NULL
   attnam = NULL
   d1 = NULL
   d2 = NULL
   gr = NULL
-  
+  out=list()
   if (dim(data.frame(x$attcoord))[2] == 1) {
     stop('There is only one dimension. A 2D scatterplot cannot be produced.')
   } 
@@ -68,6 +68,8 @@ plot.clusmca<-function(x, dims = c(1,2), what = c(TRUE,TRUE), cludesc = FALSE, t
   }
   obs_df=data.frame(d1=x$obscoord[,dim1],d2=x$obscoord[,dim2],gr=factor(x$cluster))
   
+  
+  
   if(what[1]==TRUE && what[2]==FALSE ){
     if (length(x$size) != 1)
     {
@@ -86,9 +88,9 @@ plot.clusmca<-function(x, dims = c(1,2), what = c(TRUE,TRUE), cludesc = FALSE, t
       a=a+geom_text_repel(data=group_df,colour="black",aes(label=gr))
     }
     a=a+xlab(paste("Dim.",dims[1])) + ylab(paste("Dim.",dims[2]))  
-    out = a
-    #out$map=a
-    #    print(a)
+    #out = a
+    out$map=a
+    # print(a)
     
   }
   if(what[1]==FALSE && what[2]==TRUE ){
@@ -115,9 +117,9 @@ plot.clusmca<-function(x, dims = c(1,2), what = c(TRUE,TRUE), cludesc = FALSE, t
     }
     a=a+geom_vline(xintercept=0)+geom_hline(yintercept=0)
     a=a+xlab(paste("Dim.",dims[1])) + ylab(paste("Dim.",dims[2]))  
-    out = a
-    #out$map=a
-    #    print(a)
+    #out = a
+    out$map=a
+    # print(a)
   }
   if(what[1]==TRUE && what[2]==TRUE ){
     
@@ -149,11 +151,11 @@ plot.clusmca<-function(x, dims = c(1,2), what = c(TRUE,TRUE), cludesc = FALSE, t
     a=a+geom_text_repel(data=subset(att_df,act!="outer"),aes( label = attnam),size=mysize*.8,segment.size = 0.01)
     a=a+geom_vline(xintercept=0)+geom_hline(yintercept=0)
     a=a+xlab(paste("Dim.",dims[1])) + ylab(paste("Dim.",dims[2]))  
-    out = a
-    #    out$map=a
-    #    print(a)
+    out = list()
+    out$map = a
+     # print(a)
   }
-  
+  print(a)
   if(cludesc==TRUE){
     csize = round((table(x$cluster)/sum(table(x$cluster)))*100,digits=1)
     cnames=paste("C",1:K,sep="")
@@ -174,19 +176,16 @@ plot.clusmca<-function(x, dims = c(1,2), what = c(TRUE,TRUE), cludesc = FALSE, t
       TopplotGroups$G[[jjj]]=TopplotGroups$G[[jjj]]+theme_bw()+ggtitle(cnm[jjj])
       
       if (subplot == TRUE) {
-        print(TopplotGroups$G[[jjj]])
-        print(plotGroups$G[[jjj]], vp=viewport(.15, .18, .3, .35))
-      }
+        out$stdres = TopplotGroups$G
+         print(TopplotGroups$G[[jjj]])
+         print(plotGroups$G[[jjj]], vp=viewport(.15, .18, .3, .35))
+      }else{print(TopplotGroups$G[[jjj]])}
       # print(TopplotGroups$G[[jjj]])
     }
-    if (subplot == FALSE) {
-      out = list()
-      out$map = a
-      out$stdres = TopplotGroups$G
-    }
-    #}
-  }
-  out
+   
+  }  
+  
+  invisible(out)
   
 }
 #}

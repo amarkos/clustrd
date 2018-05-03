@@ -42,7 +42,7 @@ data("hsq")
 #Cluster Correspondence Analysis with 3 clusters in 2 dimensions after 10 random starts
 outclusMCA = clusmca(hsq[,1:8], 3, 2, nstart = 10)
 #Save the ggplot2 scatterplot  
-map = plot(outclusMCA)
+map = plot(outclusMCA)$map
 #Customization (adding titles)
 map + ggtitle(paste("Cluster CA plot of the hsq data: 3 clusters of sizes ", 
 paste(outclusMCA$size, collapse = ", "),sep = "")) + 

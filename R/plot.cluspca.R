@@ -7,7 +7,7 @@ plot.cluspca<-function(x, dims = c(1,2), cludesc = FALSE, what = c(TRUE,TRUE), a
   act = NULL
   attnam = NULL
   slp = NULL
-  
+  out=list()
   if (dim(data.frame(x$attcoord))[2] == 1) {
     stop('There is only one dimension. A 2D scatterplot cannot be produced.')
   } 
@@ -90,8 +90,8 @@ plot.cluspca<-function(x, dims = c(1,2), cludesc = FALSE, what = c(TRUE,TRUE), a
     
     # if(disp==F){ggsave(filename = paste("K",deparse(K),"Map_units.pdf",sep=""),a,height=8 , width=8)
     #  }else{
-    out = a
-    #out$map=a
+    # out = a
+    out$map=a
     #  print(a)
     #  }
     
@@ -129,8 +129,8 @@ plot.cluspca<-function(x, dims = c(1,2), cludesc = FALSE, what = c(TRUE,TRUE), a
     #  if(disp==F){
     #    ggsave(filename = paste("K",deparse(K),"Map_attributes.pdf",sep=""),a,height=8 , width=8)
     #  }else{
-    out = a
-    #out$map=a
+    # out = a
+    out$map=a
     #  print(a)
     #  }
   }
@@ -206,15 +206,16 @@ plot.cluspca<-function(x, dims = c(1,2), cludesc = FALSE, what = c(TRUE,TRUE), a
     
     a=a+xlab(paste("Dim.",dims[1])) + ylab(paste("Dim.",dims[2]))  
     
-    out = a
+    out$map = a
     
   }
-  
+  print(a)
   if(cludesc==TRUE){
     cdsc = clu_means(x$odata, x$cluster, center=x$center, scale=x$scale)
-    out=list()
-    out$map = a
+    
+    # out$map = a
+    print(cdsc)
     out$parcoord = cdsc
   }
-  out 
+  invisible(out)
 }

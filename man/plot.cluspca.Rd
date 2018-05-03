@@ -45,7 +45,7 @@ data("iris", package = "datasets")
 outclusPCA = cluspca(iris[,-5], 3, 2, alpha = 0.3, rotation = "varimax")
 table(outclusPCA$cluster,iris[,5])
 #Save the ggplot2 scatterplot
-map = plot(outclusPCA)
+map = plot(outclusPCA)$map
 #Customization (adding titles)
 map + ggtitle(paste("A compromise solution between RKM and FKM on the iris: 
 3 clusters of sizes ", paste(outclusPCA$size, 

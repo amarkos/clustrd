@@ -1,4 +1,4 @@
-12e39b1fe8827a4b8cf66cbc77e8981c *DESCRIPTION
+8264ac34d336e43c3c6cc190c14a1b36 *DESCRIPTION
 3ad6c06d107c7897a0a86ccb1624a109 *NAMESPACE
 abc3f99f2d5f5855182b801b40cbd627 *R/EmptyKmeans.r
 ec46b107dbd4b7af3d0db14d7e1d1649 *R/MCAk.r
@@ -17,8 +17,8 @@ bb4834b097cab7b508983118fbe7290b *R/fitted.clusmca.R
 8e4283944b5baa01a6c80e70bfcf072e *R/nrm.r
 19b41f3bfffc6a368afee98a59a5543b *R/orth.r
 25bfe3587403329be0ef5d1eb16154af *R/outOfIndependence.r
-dbffaee39eebf3a7547439634baf345a *R/plot.clusmca.R
-843efaedee5518e85524eeaa59c6121f *R/plot.cluspca.R
+dcecccdfb5f42c3fbfccc1581d452e94 *R/plot.clusmca.R
+c008492f13847bb61e6083b7ddcc9f0a *R/plot.cluspca.R
 c4f15a2a78aa55fea8fcb20f641ed4bb *R/plot.tuneclus.R
 750317519d62b817b387d8b618ffe8f1 *R/print.clusmca.R
 f0902807dd5e4f2c1681246c6c27e7d8 *R/print.cluspca.R
@@ -38,6 +38,6 @@ e2276852d68bbbd8a05f46d63892a2a6 *man/cluspca.Rd
 aee751b479dff88cf39594f91f7d604d *man/cmc.Rd
 f8fa5c7c60aab8f686d9d8b390983bbe *man/hsq.Rd
 974d9e231fb77e66bfdb41d7d4eef002 *man/macro.Rd
-ea046c43451931e61ac28a9b7e9d5c3a *man/plot.clusmca.Rd
-437ccdd2d5d1e22c529d026e53f70352 *man/plot.cluspca.Rd
+845bbb814e9504fbd2cda1792d63bb8a *man/plot.clusmca.Rd
+223a2454add56e6d87b0386a802128bf *man/plot.cluspca.Rd
 f4c03dc3c583834f05ffa336cd910acf *man/tuneclus.Rd
