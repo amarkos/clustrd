@@ -34,9 +34,15 @@ clusCA <- function(data,nclus,ndim,nstart=100,smartStart=NULL,gamma = FALSE, see
     Dksi= chol2inv(chol(Dks))
     DZkZD= sqrt(n/q)*Dksi%*% t(Zki) %*% MZD     # equation 6 on the paper
     svdDZkZD=svd(DZkZD)
-    Lk=diag(svdDZkZD$d[1:k])
+    #this is for ndim = 1 to work
+    if (k != 1) {
+      Lk=diag(svdDZkZD$d[1:k])
+    } else {
+      Lk = data.matrix(svdDZkZD$d[1])
+    }
     G = svdDZkZD$u
     Gi = G[,1:k]
+    
     Gi=Dksi%*%Gi%*%Lk # CA row coordinates (section 2 in the paper right below formula (1))
     
     Bstar=svdDZkZD$v
@@ -67,7 +73,7 @@ clusCA <- function(data,nclus,ndim,nstart=100,smartStart=NULL,gamma = FALSE, see
       #empty clusters
       if(is.list(outK) == F){
         outK=EmptyKmeans(Yi,centers=Gi) 
-      #  break 
+        #  break 
       }
       Zki=outK$cluster
       Gi=outK$centers
@@ -83,14 +89,19 @@ clusCA <- function(data,nclus,ndim,nstart=100,smartStart=NULL,gamma = FALSE, see
       
       outDkZkZD=svd(DkZkZD)       # New SVD, CA analysis
       
-      Lk=diag(outDkZkZD$d[1:k])
       G=outDkZkZD$u
       Gi=G[,1:k]
+      # this is for ndim = 1 to work
+      if (k != 1) {
+        Lk=diag(outDkZkZD$d[1:k])
+      } else {
+        Lk = data.matrix(outDkZkZD$d[1])
+      }
+      
       Gi = Dksi %*% Gi %*% Lk
       Bstar=outDkZkZD$v
       Bi=Bstar[,1:k]
       B=sqrt(n*q)*Dzhi%*%Bi
-      
       Bns=B[,1:k]
       #Attribute quantifications
       Yi= sqrt((n/q)) * MZD %*% Bi # Subject coordinates

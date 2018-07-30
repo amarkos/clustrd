@@ -2,7 +2,7 @@ MCAk <- function(data, nclus = 3, ndim = 2, alphak = .5, nstart = 100, smartStar
   out=list()
   data=data.frame(data)
   if (alphak == 1) { #Tandem approach MCA + k-means
-   
+    
     n = nrow(data)
     #asymmetric map, biplot
     A = mjca(data)$colcoord[,1:ndim]
@@ -16,14 +16,15 @@ MCAk <- function(data, nclus = 3, ndim = 2, alphak = .5, nstart = 100, smartStar
     }
     
     U = dummy(randVec)
-    center = pseudoinverse(t(U) %*% U) %*% t(U) %*% Fm 
+    
+    center = chol2inv(chol(crossprod(U))) %*% t(U) %*% Fm 
     outK = try(kmeans(Fm, centers = center, nstart = 100), silent = TRUE)
     
     center=outK$centers
     
     if(is.list(outK) == FALSE){
       outK = EmptyKmeans(Fm,centers=center)  
-     # break
+      # break
     }
     
     index = outK$cluster
@@ -34,8 +35,9 @@ MCAk <- function(data, nclus = 3, ndim = 2, alphak = .5, nstart = 100, smartStar
     aa = sort(size,decreasing = TRUE)
     
     if (gamma == TRUE) {
-      distB = sum(diag(t(A)%*%  A))
-      distG = sum(diag(t(center)%*% center))
+      distB = sum(diag(crossprod(A)))
+      
+      distG = sum(diag(crossprod(center)))
       g = ((nclus/ncol(data))* distB/distG)^.25
       
       A = (1/g)*A
@@ -67,16 +69,17 @@ MCAk <- function(data, nclus = 3, ndim = 2, alphak = .5, nstart = 100, smartStar
     oner = matrix(1,n,1)
     muz  = colMeans(zz)
     z = zz - oner %*% muz  
-    rr = colSums(t(zz) %*% zz)
-    invsqDr = diag(1/sqrt(rr))
+    rr = colSums(crossprod(zz))
+    invsqDr = 1/sqrt(rr) 
+    #  invsqDr =diag(1/sqrt(rr))
+    
     M = z
-    Pz = z %*% invsqDr
-    PPz = t(Pz) %*% Pz
+    Pz = t(t(z) * as.vector(invsqDr) )  
+    PPz = crossprod(Pz)
     
     svdPz = svd(PPz)
-    invsqD = diag((1/sqrt(svdPz$d))) 
-    Fm = Pz %*%  svdPz$v %*% invsqD
-    F0 = Fm[, 1:ndim]
+    invsqD = 1/sqrt(svdPz$d[1:ndim])
+    F0 = t(t(Pz %*%  svdPz$v[,1:ndim]) * as.vector(invsqD))
     
     oldf = 1e+06
     
@@ -94,7 +97,15 @@ MCAk <- function(data, nclus = 3, ndim = 2, alphak = .5, nstart = 100, smartStar
       
       U = dummy(randVec)
       
-      center = pseudoinverse(t(U) %*% U) %*% t(U) %*% Fm 
+      #   center = pseudoinverse(t(U) %*% U) %*% t(U) %*% Fm 
+      
+      mydata = as_tibble(cbind(Fm,group = as.factor(randVec)))
+      
+      center=mydata%>%
+        group_by(group) %>%
+        summarise_all(mean) %>%
+        select(-group)
+      
       itmax = 100
       it = 0
       ceps = 1e-04
@@ -118,40 +129,42 @@ MCAk <- function(data, nclus = 3, ndim = 2, alphak = .5, nstart = 100, smartStar
         center=outK$centers
         index = outK$cluster
         U = dummy(index)
-        U0=U-oner %*% colMeans(U)
-        uu = colSums(t(U)%*% U)
-        invsqDru=diag(1/sqrt(c(rr,uu)))
+        U0 = scale(U,center=TRUE, scale=FALSE)
+        uu = colSums(crossprod(U)) #colSums(t(U)%*% U)
+        invsqDru = 1/sqrt(c(rr,uu))
         
         ####################################################################
         ## STEP 2: update of Fm and Wj ######################################
         ####################################################################
         MU = cbind(alphak*M,(1-alphak)*U0)
-        Pzu = MU %*% invsqDru
+        Pzu = t(t(MU) * as.vector(invsqDru))
         
         Pzu[is.nan(Pzu)] <- 0
         PPzu = t(Pzu) %*% Pzu
         svdPzu = svd(PPzu)
-        invsqD = diag(1/sqrt(svdPzu$d))
-        Fm = Pzu %*% svdPzu$u %*% invsqD
-        Fm = Fm[, 1:ndim]
+        #invsqD = diag(1/sqrt(svdPzu$d))
+        
+        Fm = t(t(Pzu %*% svdPzu$u[,1:ndim]) * as.vector(1/sqrt(svdPzu$d[1:ndim])))
         ft1 = 0
         k = 1
         kk = 0
         kk = kk+zncati[1]
         Tm = z[,k:kk]
-        W = pseudoinverse(t(Tm)%*% Tm)%*% t(Tm) %*% Fm 
+        #chol2inv(chol(crossprod(Tm))) gives an error!
+        W = pseudoinverse(crossprod(Tm))%*% t(Tm) %*% Fm 
         A = W
-        ft1 = ft1+sum(diag((t(Fm) %*% Fm)-(t(Fm) %*% Tm %*% W)))
+        ft1 = ft1+sum(diag((crossprod(Fm))-(t(Fm) %*% Tm %*% W)))
         k = kk+1
         for(j in 2:zitem){
           kk = kk+zncati[j]
           Tm = z[,k:kk]
-          W = pseudoinverse(t(Tm)%*% Tm)%*% t(Tm) %*% Fm 
+          W = pseudoinverse(crossprod(Tm))%*% t(Tm) %*% Fm 
+          
           A = rbind(A,W)
-          ft1 = ft1 + sum(diag((t(Fm) %*% Fm)-(t(Fm) %*% Tm %*% W))) ## MCA
+          ft1 = ft1 + sum(diag((crossprod(Fm))-(t(Fm) %*% Tm %*% W))) ## MCA
           k=kk+1
         }
-        ft2 = sum(diag((t(Fm) %*% Fm) - (t(Fm) %*% U %*% center)))
+        ft2 = sum(diag((crossprod(Fm)) - (t(Fm) %*% U %*% center)))
         #check again
         f =  alphak*ft1 + (1-alphak)*ft2
         
@@ -164,8 +177,8 @@ MCAk <- function(data, nclus = 3, ndim = 2, alphak = .5, nstart = 100, smartStar
         
         #####gamma scaling
         if (gamma == TRUE) {
-          distB = sum(diag(t(A)%*%  A))
-          distG = sum(diag(t(center)%*% center))
+          distB = sum(diag(crossprod(A)))
+          distG = sum(diag(crossprod(center)))
           g = ((nclus/zitem)* distB/distG)^.25
           
           A = (1/g)*A
@@ -183,7 +196,7 @@ MCAk <- function(data, nclus = 3, ndim = 2, alphak = .5, nstart = 100, smartStar
       }
     } ##end of FOR
     
-   
+    
     Fm = oldF
     index = oldindex
     cluster = as.numeric(index)

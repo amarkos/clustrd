@@ -10,6 +10,3 @@ Depends: ggplot2, dummies, grid
 Imports: corpcor, GGally, fpc, cluster, dplyr, plyr, ggrepel, ca, stats
 License: GPL (>= 2)
 NeedsCompilation: no
-Packaged: 2018-05-03 16:45:30 UTC; amarkos
-Repository: CRAN
-Date/Publication: 2018-05-03 17:45:42 UTC
